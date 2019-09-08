@@ -110,7 +110,7 @@ bot.on('message', msg => {
       });
     }
     else {
-      msg.reply("check you DMs!");
+      msg.reply("check your DMs!");
       embeds.forEach(function (i) {
         msg.author.send({embed: i});
       });
