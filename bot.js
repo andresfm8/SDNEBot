@@ -112,7 +112,7 @@ bot.on('message', msg => {
     else {
       msg.reply("check you DMs!");
       embeds.forEach(function (i) {
-        msg.author.sendMessage({embed: i});
+        msg.author.send({embed: i});
       });
     }
   }
