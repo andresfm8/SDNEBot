@@ -139,11 +139,6 @@ bot.on('message', msg => {
       usr.addRole("620641321908043798"); // Davis
       usr.removeRole("620655283303088139"); // HMC
       msg.reply("welcome to Davis!");
-    } else if (campus.toLowerCase() === "hmc") {
-      usr.removeRole("620641262101463070"); // Trafalgar
-      usr.removeRole("620641321908043798"); // Davis
-      usr.addRole("620655283303088139"); // HMC
-      msg.reply("welcome to HMC!");
     } else {
       msg.reply("that is an invalid campus. <:catSad:619611587577249853>");
     }
