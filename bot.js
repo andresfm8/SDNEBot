@@ -60,6 +60,10 @@ bot.on('message', msg => {
         {
           name: "Get Rules",
           value: "```!rules```"
+        },
+        {
+          name: "???",
+          value: "```!killMe```"
         }
         ],
         timestamp: new Date(),
@@ -116,7 +120,8 @@ bot.on('message', msg => {
       });
     }
   } else if (msg.content === "!killMe") {
-    msg.channel.send("@" + msg.author.id + " has died, they will be missed... :catSad:");
+    const sad = bot.emojis.get("620608686934720522");
+    msg.channel.send("<@" + msg.author.id + "> has died, they will be missed... " + sad);
   }
 });
 
