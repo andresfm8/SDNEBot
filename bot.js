@@ -106,7 +106,7 @@ bot.on('message', msg => {
       },
       {
         title: "Information",
-        description: "To access all channels, you must assign which year you are in from 1-4 in the SDNE program. 4 represents Alumni. \n```!year <your year>``` in the #assign-year channel. \n \nEach year gets their own category where members  of that year can add channels for whatever they would like to discuss.",
+        description: "To access all channels, you must assign which year you are in from 1-4 in the SDNE program. 4 represents Alumni. \n```!year <your year>``` in the #assign-year channel. \n \nEach year gets their own category where members of that year can add channels for whatever they would like to discuss.\nYou can also assign your campus with ```!campus <campus-name>```so you can find others on your campus!",
         color: 10197915
       }
     ]
@@ -133,17 +133,17 @@ bot.on('message', msg => {
       usr.addRole("620641262101463070"); // Trafalgar
       usr.removeRole("620641321908043798"); // Davis
       usr.removeRole("620655283303088139"); // HMC
-      msg.reply("Welcome to Trafalgar!");
+      msg.reply("welcome to Trafalgar!");
     } else if (campus.toLowerCase() === "davis") {
       usr.removeRole("620641262101463070"); // Trafalgar
       usr.addRole("620641321908043798"); // Davis
       usr.removeRole("620655283303088139"); // HMC
-      msg.reply("Welcome to Davis!");
+      msg.reply("welcome to Davis!");
     } else if (campus.toLowerCase() === "hmc") {
       usr.removeRole("620641262101463070"); // Trafalgar
       usr.removeRole("620641321908043798"); // Davis
       usr.addRole("620655283303088139"); // HMC
-      msg.reply("Welcome to HMC!");
+      msg.reply("welcome to HMC!");
     } else {
       msg.reply("that is an invalid campus. <:catSad:619611587577249853>");
     }
