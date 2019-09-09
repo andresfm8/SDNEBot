@@ -106,17 +106,17 @@ bot.on('message', msg => {
     if (msg.channel.id == "619585833636200449") {
       msg.delete();
       embeds.forEach(function (i) {
-        msg.channel.send({embed: i});
+        msg.channel.send({ embed: i });
       });
     }
     else {
       msg.reply("check your DMs!");
       embeds.forEach(function (i) {
-        msg.author.send({embed: i});
+        msg.author.send({ embed: i });
       });
     }
   } else if (msg.content === "!killMe") {
-    msg.channel.search("@" + msg.author.id + " has died, they will be missed... :catSad:");
+    msg.channel.send("@" + msg.author.id + " has died, they will be missed... :catSad:");
   }
 });
 
