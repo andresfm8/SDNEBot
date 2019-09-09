@@ -36,7 +36,7 @@ bot.on('message', msg => {
       usr.addRole("619582173522952233") //Alumni
       msg.reply('you are now in the role associated with your year!');
     } else {
-      msg.reply("that's not a vaild year, try between 1-4!");
+      msg.reply("that's not a valid year, try between 1-4!");
     }
   } else if (msg.content === "!plsHelp") {
     msg.delete();
@@ -115,6 +115,8 @@ bot.on('message', msg => {
         msg.author.send({embed: i});
       });
     }
+  } else if (msg.content === "!killMe") {
+    msg.channel.search("@" + msg.author.id + " has died, they will be missed... :catSad:");
   }
 });
 
