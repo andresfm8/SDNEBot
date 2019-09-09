@@ -120,8 +120,7 @@ bot.on('message', msg => {
       });
     }
   } else if (msg.content === "!killMe") {
-    const sad = bot.emojis.get("620608686934720522");
-    msg.channel.send("<@" + msg.author.id + "> has died, they will be missed... " + sad);
+    msg.channel.send("<@" + msg.author.id + "> has died, they will be missed... <:catSad:619611587577249853>");
   }
 });
 
