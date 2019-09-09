@@ -145,7 +145,7 @@ bot.on('message', msg => {
       usr.addRole("620655283303088139"); // HMC
       msg.reply("Welcome to HMC!");
     } else {
-      msg.reply("that is an invalid campus. <:catSad:620608686934720522>");
+      msg.reply("that is an invalid campus. <:catSad:619611587577249853>");
     }
   }
 });
