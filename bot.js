@@ -121,6 +121,19 @@ bot.on('message', msg => {
     }
   } else if (msg.content === "!killMe") {
     msg.channel.send("<@" + msg.author.id + "> has died, they will be missed... <:catSad:619611587577249853>");
+  } else if (msg.content.startsWith("!campus ")) {
+    let txt = msg.content.split(" ");
+    let campus = txt[1];
+    let usr = msg.member;
+    if (campus.toLowerCase() === "trafalgar") {
+      usr.addRole("620641262101463070"); // Trafalgar
+      usr.removeRole("620641321908043798"); // Davis
+    } else if (campus.toLowerCase() === "davis") {
+      usr.removeRole("620641262101463070"); // Trafalgar
+      usr.addRole("620641321908043798"); // Davis
+    } else {
+      msg.reply("that is an invalid campus. <:catSad:620608686934720522>");
+    }
   }
 });
 
