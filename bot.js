@@ -54,6 +54,10 @@ bot.on('message', msg => {
           value: "```!year <year>\nUse \"4\" if you are Alumni```"
         },
         {
+          name: "Assign Campus",
+          value: "```!campus <campus name>```"
+        },
+        {
           name: "View Help Menu",
           value: "```!plsHelp```"
         },
@@ -128,9 +132,18 @@ bot.on('message', msg => {
     if (campus.toLowerCase() === "trafalgar") {
       usr.addRole("620641262101463070"); // Trafalgar
       usr.removeRole("620641321908043798"); // Davis
+      usr.removeRole("620655283303088139"); // HMC
+      msg.reply("Welcome to Trafalgar!");
     } else if (campus.toLowerCase() === "davis") {
       usr.removeRole("620641262101463070"); // Trafalgar
       usr.addRole("620641321908043798"); // Davis
+      usr.removeRole("620655283303088139"); // HMC
+      msg.reply("Welcome to Davis!");
+    } else if (campus.toLowerCase() === "hmc") {
+      usr.removeRole("620641262101463070"); // Trafalgar
+      usr.removeRole("620641321908043798"); // Davis
+      usr.addRole("620655283303088139"); // HMC
+      msg.reply("Welcome to HMC!");
     } else {
       msg.reply("that is an invalid campus. <:catSad:620608686934720522>");
     }
