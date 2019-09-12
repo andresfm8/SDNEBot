@@ -140,6 +140,11 @@ bot.on('message', msg => {
     } else {
       msg.reply("that is an invalid campus. <:catSad:619611587577249853>");
     }
+  } else if ((!msg.content.startsWith("!year ") && !msg.content.startsWith("!campus ")) && msg.channel.id == "619603429379014667") {
+    msg.delete();
+    msg.reply("this channel is for assigning your year and campus only.").then(msg => {
+      msg.delete(5000);
+    });
   }
 });
 
