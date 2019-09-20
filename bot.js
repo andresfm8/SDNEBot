@@ -150,4 +150,17 @@ bot.on('message', msg => {
   }
 });
 
+bot.on('guildMemberAdd', member => {
+  const e =
+  {
+    title: "Information",
+    description: "To access all channels, you must assign which year you are in from 1-4 in the SDNE program. 4 represents Alumni. \n```!year <your year>``` in the #assign-year channel. \n \nEach year gets their own category where members of that year can add channels for whatever they would like to discuss.\nYou can also assign your campus with ```!campus <campus-name>```so you can find others on your campus!",
+    color: 10197915
+  }
+
+  member.send("Welcome to the SDNE Discord Server!");
+  member.send({ embed: e });
+
+});
+
 bot.login('NjE5NTkwOTQ5MzAzMDkxMjEx.XXKdeQ.bLymm-XWu37fp5GYFZq5HUjugUE');
