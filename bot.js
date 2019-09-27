@@ -147,6 +147,15 @@ bot.on('message', msg => {
         msg.delete();
       }, 5000);
     });
+  } else if (msg.content === "!genInvite" && msg.member.highestRole.id == "619581765345869844") {
+    msg.guild.channels.get("id", "619585833636200449").createInvite({
+      maxAge: 0,
+      unique: false,
+      temporary: false,
+      maxUses: 0
+    }, "New Invite Created by Bot").then(function (invite) {
+      msg.reply("a new Invite Link has been generated, "+invite.url);
+    });
   }
 });
 
