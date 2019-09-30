@@ -154,8 +154,18 @@ bot.on('message', msg => {
       temporary: false,
       maxUses: 0
     }, "New Invite Created by Bot").then(function (invite) {
-      msg.reply("a new Invite Link has been generated, "+invite.url);
+      msg.reply("a new Invite Link has been generated, " + invite.url);
     });
+  } else if (msg.content.startsWith("!wakeUp ") && msg.member.highestRole.id == "619581765345869844") {
+    let mentioned = msg.mentions.users;
+    let count = 0;
+    setInterval(function() {
+      if (count >= 4)
+        break;
+
+      mentioned.first().send("Hey! Wake Up!");
+      count++;
+    }, 150000)
   }
 });
 
