@@ -157,11 +157,13 @@ bot.on('message', msg => {
       msg.reply("a new Invite Link has been generated, " + invite.url);
     });
   } else if (msg.content.startsWith("!wakeUp ") && msg.member.highestRole.id == "619581765345869844") {
+    msg.reply("done!");
     let mentioned = msg.mentions.users;
-    let count = 0;
-    setInterval(function() {
+    let count = 1;
+    mentioned.first().send("Hey! Wake Up!");
+    let i = setInterval(function() {
       if (count >= 4)
-        break;
+        clearInterval(i);
 
       mentioned.first().send("Hey! Wake Up!");
       count++;
