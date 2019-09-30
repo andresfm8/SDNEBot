@@ -159,8 +159,7 @@ bot.on('message', msg => {
   } else if (msg.content.startsWith("!wakeUp ") && msg.member.highestRole.id == "619581765345869844") {
     msg.reply("done!");
     let mentioned = msg.mentions.users;
-    let count = 1;
-    mentioned.first().send("Hey! Wake Up!");
+    let count = 0;
     let i = setInterval(function() {
       if (count >= 4)
         clearInterval(i);
