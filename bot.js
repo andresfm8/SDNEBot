@@ -106,7 +106,7 @@ bot.on('message', msg => {
       },
       {
         title: "Information",
-        description: "To access all channels, you must assign which year you are in from 1-4 in the SDNE program. 4 represents Alumni. \n```!year <your year>``` in the #assign-year channel. \n \nEach year gets their own category where members of that year can add channels for whatever they would like to discuss.\nYou can also assign your campus with ```!campus <campus-name>```so you can find others on your campus!",
+        description: "To access all channels, you must assign which year you are in from 1-4 in the SDNE program. 4 represents Alumni. \n```!year <your year>``` in the <#619603429379014667> channel. \n \nEach year gets their own category where members of that year can add channels for whatever they would like to discuss.\nYou can also assign your campus with ```!campus <campus-name>```so you can find others on your campus!",
         color: 10197915
       }
     ]
@@ -123,8 +123,6 @@ bot.on('message', msg => {
         msg.author.send({ embed: i });
       });
     }
-  } else if (msg.content === "!killMe") {
-    msg.channel.send("<@" + msg.author.id + "> has died, they will be missed... <:catSad:619611587577249853>");
   } else if (msg.content.startsWith("!campus ")) {
     let txt = msg.content.split(" ");
     let campus = txt[1];
@@ -156,19 +154,24 @@ bot.on('message', msg => {
     }, "New Invite Created by Bot").then(function (invite) {
       msg.reply("a new Invite Link has been generated, " + invite.url);
     });
-  } else if (msg.content.startsWith("!wakeUp ") && msg.member.highestRole.id == "619581765345869844") {
-    msg.reply("done!");
+  } else if (msg.content.startsWith("!kill ")) {
     let mentioned = msg.mentions.users;
-    let count = 0;
-    let i = setInterval(function() {
-      if (count >= 4)
-        clearInterval(i);
-
-      mentioned.first().send("Hey! Wake Up!");
-      count++;
-    }, 150000)
+    let toKill = mentioned.first();
+    if (toKill.id == msg.author.id) {
+      msg.channel.send("<@" + msg.author.id + "> killed themselves... <:catSad:619611587577249853>");
+    } else {
+      msg.channel.send("<@" + msg.author.id + "> killed <@" + toKill.id + ">... <:catSad:619611587577249853>");
+    }
+  } else if (msg.content.startsWith("!warn ") && msg.member.highestRole.id == "619581765345869844") {
+    let mentioned = msg.mentions.users.first();
+    let reply = "";
+    msg.channel.send("<@" + mentioned.id + ">, you have been warned, please refer to <#619585833636200449> for the rules");
   }
 });
+
+function logMapElements(value, key, map) {
+  console.log(`m[${key}] = ${value}`);
+}
 
 bot.on('guildMemberAdd', member => {
   const e =
