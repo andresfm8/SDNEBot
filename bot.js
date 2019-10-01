@@ -66,8 +66,8 @@ bot.on('message', msg => {
           value: "```!rules```"
         },
         {
-          name: "???",
-          value: "```!killMe```"
+          name: "Kill Someone",
+          value: "```!kill @Name```"
         }
         ],
         timestamp: new Date(),
