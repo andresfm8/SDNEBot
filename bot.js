@@ -10,7 +10,7 @@ bot.on('message', msg => {
   if (msg.content.startsWith("!year ")) {
     let txt = msg.content.split(" ");
     let year = txt[1];
-    let usr = msg.member;
+    const usr = msg.member;
     if (year === "1") {
       usr.addRole("619581998574469120"); // 1st Year
       usr.removeRole("619582112936362020"); // 2nd Year
@@ -166,6 +166,8 @@ bot.on('message', msg => {
     let mentioned = msg.mentions.users.first();
     let reply = "";
     msg.channel.send("<@" + mentioned.id + ">, you have been warned, please refer to <#619585833636200449> for the rules");
+  } else if (msg.content.startsWith("!")) {
+    msg.reply("invaild command, use `!plsHelp` for help");
   }
 });
 
