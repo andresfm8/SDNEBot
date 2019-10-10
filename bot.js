@@ -168,6 +168,8 @@ bot.on('message', msg => {
     msg.channel.send("<@" + mentioned.id + ">, you have been warned, please refer to <#619585833636200449> for the rules");
   } else if (msg.content.startsWith("!")) {
     msg.reply("invaild command, use `!plsHelp` for help");
+  } else if (msg.content.startsWith("!ban ") && msg.member.highestRole.id == "619581765345869844") {
+    msg.reply("NO.");
   }
 });
 
