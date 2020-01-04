@@ -174,7 +174,13 @@ bot.on('message', msg => {
   } else if (msg.content === "!uptime") {
     let time = process.uptime();
     let uptime = (time + "").toHHMMSS();
-    msg.reply("I've been awake for `" + uptime + "` now!");
+    msg.reply("I've been awake for `" + uptime + "` now!").then(() => {
+      setInterval(() => {
+        time = process.uptime();
+        uptime = (time + "").toHHMMSS();
+        msg.edit("I've been awake for `" + uptime + "` now!");
+      }, Math.round(Math.random() * 4500) + 500);
+    });
   } else if (msg.content.startsWith("!")) { // If user tries a commond that doesn't exist
     msg.reply("invaild command, use `!help` for a list of commands");
   }
