@@ -179,7 +179,7 @@ bot.on('message', msg => {
         time = process.uptime();
         uptime = (time + "").toHHMMSS();
         msg.edit("I've been awake for `" + uptime + "` now!");
-      }, Math.round(Math.random() * (300000 - 30000)) + 30000);
+      }, 1000);
     });
   } else if (msg.content.startsWith("!")) { // If user tries a commond that doesn't exist
     msg.reply("invaild command, use `!help` for a list of commands");
