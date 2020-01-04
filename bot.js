@@ -3,11 +3,11 @@ const bot = new Discord.Client();
 
 bot.on('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`);
-  bot.user.setActivity("!plsHelp");
+  bot.user.setActivity("!help commands", { type: "LISTENING" });
 });
 
 bot.on('message', msg => {
-  if (msg.content.startsWith("!year ")) {
+  if (msg.content.startsWith("!year ")) { // Assign Year
     let txt = msg.content.split(" ");
     let year = txt[1];
     const usr = msg.member;
@@ -38,7 +38,22 @@ bot.on('message', msg => {
     } else {
       msg.reply("that's not a valid year, try between 1-4!");
     }
-  } else if (msg.content === "!plsHelp") {
+  } else if (msg.content.startsWith("!campus ")) { // Assign Campus
+    let txt = msg.content.split(" ");
+    let campus = txt[1];
+    let usr = msg.member;
+    if (campus.toLowerCase() === "trafalgar") {
+      usr.addRole("620641262101463070"); // Trafalgar
+      usr.removeRole("620641321908043798"); // Davis
+      msg.reply("welcome to Trafalgar!");
+    } else if (campus.toLowerCase() === "davis") {
+      usr.removeRole("620641262101463070"); // Trafalgar
+      usr.addRole("620641321908043798"); // Davis
+      msg.reply("welcome to Davis!");
+    } else {
+      msg.reply("that is an invalid campus. <:catSad:619611587577249853>");
+    }
+  } else if (msg.content === "!help") { // View Commands
     msg.delete();
     msg.channel.send({
       embed: {
@@ -59,15 +74,11 @@ bot.on('message', msg => {
         },
         {
           name: "View Help Menu",
-          value: "```!plsHelp```"
+          value: "```!help```"
         },
         {
-          name: "Get Rules",
+          name: "View Rules",
           value: "```!rules```"
-        },
-        {
-          name: "Kill Someone",
-          value: "```!kill @Name```"
         }
         ],
         timestamp: new Date(),
@@ -77,7 +88,7 @@ bot.on('message', msg => {
         }
       }
     });
-  } else if (msg.content === "!rules") {
+  } else if (msg.content === "!rules") { // View Rules
     const embeds = [
       {
         title: "Rule 1 - Keep it friendly and respectful. ",
@@ -123,29 +134,17 @@ bot.on('message', msg => {
         msg.author.send({ embed: i });
       });
     }
-  } else if (msg.content.startsWith("!campus ")) {
-    let txt = msg.content.split(" ");
-    let campus = txt[1];
-    let usr = msg.member;
-    if (campus.toLowerCase() === "trafalgar") {
-      usr.addRole("620641262101463070"); // Trafalgar
-      usr.removeRole("620641321908043798"); // Davis
-      msg.reply("welcome to Trafalgar!");
-    } else if (campus.toLowerCase() === "davis") {
-      usr.removeRole("620641262101463070"); // Trafalgar
-      usr.addRole("620641321908043798"); // Davis
-      msg.reply("welcome to Davis!");
-    } else {
-      msg.reply("that is an invalid campus. <:catSad:619611587577249853>");
-    }
-  } else if (!msg.content.startsWith("!year ") && !msg.content.startsWith("!campus ") && msg.channel.id == "619603429379014667" && msg.author.id != "619590949303091211") {
+
+  } else if (!msg.content.startsWith("!year ") && !msg.content.startsWith("!campus ") &&
+    msg.channel.id == "619603429379014667" && msg.author.id != "619590949303091211") { // Delete Messages in incorrect channel
+
     msg.delete();
-    msg.reply("this channel is for assigning your year and campus only.").then(msg => {
+    msg.reply("this channel is for assigning your year and campus only with `!year #` & `!campus Campus`").then(msg => {
       setTimeout(() => {
         msg.delete();
       }, 5000);
     });
-  } else if (msg.content === "!genInvite" && msg.member.highestRole.id == "619581765345869844") {
+  } else if (msg.content === "!invite" && msg.member.highestRole.id == "619581765345869844") { // Generates Invite from Bot
     msg.guild.channels.get("id", "619585833636200449").createInvite({
       maxAge: 0,
       unique: false,
@@ -154,27 +153,35 @@ bot.on('message', msg => {
     }, "New Invite Created by Bot").then(function (invite) {
       msg.reply("a new Invite Link has been generated, " + invite.url);
     });
-  } else if (msg.content.startsWith("!kill ")) {
-    let mentioned = msg.mentions.users;
-    let toKill = mentioned.first();
-    if (toKill.id == msg.author.id) {
-      msg.channel.send("<@" + msg.author.id + "> killed themselves... <:catSad:619611587577249853>");
-    } else {
-      msg.channel.send("<@" + msg.author.id + "> killed <@" + toKill.id + ">... <:catSad:619611587577249853>");
-    }
-  } else if (msg.content.startsWith("!warn ") && msg.member.highestRole.id == "619581765345869844") {
+  } else if (msg.content.startsWith("!warn ") && msg.member.highestRole.id == "619581765345869844") { // Warn User
     let mentioned = msg.mentions.users.first();
-    let reply = "";
+    msg.delete();
     msg.channel.send("<@" + mentioned.id + ">, you have been warned, please refer to <#619585833636200449> for the rules");
-  } else if (msg.content.startsWith("!ban ") && msg.member.highestRole.id == "619581765345869844") {
-    msg.reply("NO.");
-  } else if (msg.content.startsWith("!")) {
-    msg.reply("invaild command, use `!plsHelp` for help");
+  } else if (msg.content === "!reassign" && msg.member.highestRole.id == "619581765345869844") {
+    let members = [];
+    members = msg.channel.members;
+    members.forEach(function (e, i) {
+      if (e.highestRole.id == "619560877405896714") {
+        addRole("663060867490775071", "Default Unassigned Role");
+      }
+    });
+    msg.delete();
+    msg.reply("it is done").then( () => {
+      setTimeout(() => {
+        msg.delete();
+      }, 5000);
+    })
+  } else if (msg.content.startsWith("!")) { // If user tries a commond that doesn't exist
+    msg.reply("invaild command, use `!help` for a list of commands");
   }
 });
 
 function logMapElements(value, key, map) {
   console.log(`m[${key}] = ${value}`);
+}
+
+async function addRole (member, roleID, reason) {
+  await member.addRole(roleID, reason).catch(console.error);
 }
 
 bot.on('guildMemberAdd', member => {
@@ -187,6 +194,7 @@ bot.on('guildMemberAdd', member => {
 
   member.send("Welcome to the SDNE Discord Server!");
   member.send({ embed: e });
+  member.addRole("663060867490775071", "Default Unassigned Role");
 
 });
 
