@@ -166,21 +166,34 @@ bot.on('message', msg => {
       }
     });
     msg.delete();
-    msg.reply("it is done").then( () => {
+    msg.reply("it is done").then(() => {
       setTimeout(() => {
         msg.delete();
       }, 5000);
     })
+  } else if (msg.content === "!uptime") {
+    let time = process.uptime();
+    let uptime = (time + "").toHHMMSS();
+    msg.reply("I've been awake for `" + uptime + "` now!");
   } else if (msg.content.startsWith("!")) { // If user tries a commond that doesn't exist
     msg.reply("invaild command, use `!help` for a list of commands");
   }
 });
 
-function logMapElements(value, key, map) {
-  console.log(`m[${key}] = ${value}`);
+String.prototype.toHHMMSS = function () {
+  var sec_num = parseInt(this, 10); // don't forget the second param
+  var hours = Math.floor(sec_num / 3600);
+  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+  var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+  if (hours < 10) { hours = "0" + hours; }
+  if (minutes < 10) { minutes = "0" + minutes; }
+  if (seconds < 10) { seconds = "0" + seconds; }
+  var time = hours + ' hrs, ' + minutes + ' mins & ' + seconds + ' seconds';
+  return time;
 }
 
-async function addRole (member, roleID, reason) {
+async function addRole(member, roleID, reason) {
   await member.addRole(roleID, reason).catch(console.error);
 }
 
