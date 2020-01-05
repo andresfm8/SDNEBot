@@ -180,7 +180,7 @@ bot.on('message', msg => {
         time = process.uptime();
         uptime = (time + "").toHHMMSS();
         m.edit("I've been awake for `" + uptime + "` now!");
-        updateMS = Math.round(Math.Random() * (30000 - 5000)) + 5000;
+        updateMS = Math.round(Math.random() * (30000 - 5000)) + 5000;
       }, updateMS);
     });
   } else if (msg.content.startsWith("!")) { // If user tries a commond that doesn't exist
