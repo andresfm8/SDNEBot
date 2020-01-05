@@ -175,11 +175,13 @@ bot.on('message', msg => {
     let time = process.uptime();
     let uptime = (time + "").toHHMMSS();
     msg.channel.send("I've been awake for `" + uptime + "` now!").then((m) => {
+      var updateMS = 15000;
       setInterval(() => {
         time = process.uptime();
         uptime = (time + "").toHHMMSS();
         m.edit("I've been awake for `" + uptime + "` now!");
-      }, Math.round(Math.Random() * (120000 - 15000)) + 15000);
+        updateMS = Math.round(Math.Random() * (30000 - 5000)) + 5000;
+      }, updateMS);
     });
   } else if (msg.content.startsWith("!")) { // If user tries a commond that doesn't exist
     msg.reply("invaild command, use `!help` for a list of commands");
