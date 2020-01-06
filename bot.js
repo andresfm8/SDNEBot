@@ -8,50 +8,58 @@ bot.on('ready', () => {
 
 bot.on('message', msg => {
   if (msg.content.startsWith("!year ")) { // Assign Year
-    let txt = msg.content.split(" ");
-    let year = txt[1];
-    const usr = msg.member;
-    if (year === "1") {
-      usr.addRole("619581998574469120"); // 1st Year
-      usr.removeRole("619582112936362020"); // 2nd Year
-      usr.removeRole("619582159899852802") // 3rd Year
-      usr.removeRole("619582173522952233") //Alumni
-      msg.reply('you are now in the role associated with your year!');
-    } else if (year === "2") {
-      usr.removeRole("619581998574469120"); // 1st Year
-      usr.addRole("619582112936362020"); // 2nd Year
-      usr.removeRole("619582159899852802") // 3rd Year
-      usr.removeRole("619582173522952233") //Alumni
-      msg.reply('you are now in the role associated with your year!');
-    } else if (year === "3") {
-      usr.removeRole("619581998574469120"); // 1st Year
-      usr.removeRole("619582112936362020"); // 2nd Year
-      usr.addRole("619582159899852802") // 3rd Year
-      usr.removeRole("619582173522952233") //Alumni
-      msg.reply('you are now in the role associated with your year!');
-    } else if (year === "4") {
-      usr.removeRole("619581998574469120"); // 1st Year
-      usr.removeRole("619582112936362020"); // 2nd Year
-      usr.removeRole("619582159899852802") // 3rd Year
-      usr.addRole("619582173522952233") //Alumni
-      msg.reply('you are now in the role associated with your year!');
+    if (msg.channel.id === "619603429379014667") {
+      let txt = msg.content.split(" ");
+      let year = txt[1];
+      const usr = msg.member;
+      if (year === "1") {
+        usr.addRole("619581998574469120"); // 1st Year
+        usr.removeRole("619582112936362020"); // 2nd Year
+        usr.removeRole("619582159899852802") // 3rd Year
+        usr.removeRole("619582173522952233") //Alumni
+        msg.reply('you are now in the role associated with your year!');
+      } else if (year === "2") {
+        usr.removeRole("619581998574469120"); // 1st Year
+        usr.addRole("619582112936362020"); // 2nd Year
+        usr.removeRole("619582159899852802") // 3rd Year
+        usr.removeRole("619582173522952233") //Alumni
+        msg.reply('you are now in the role associated with your year!');
+      } else if (year === "3") {
+        usr.removeRole("619581998574469120"); // 1st Year
+        usr.removeRole("619582112936362020"); // 2nd Year
+        usr.addRole("619582159899852802") // 3rd Year
+        usr.removeRole("619582173522952233") //Alumni
+        msg.reply('you are now in the role associated with your year!');
+      } else if (year === "4") {
+        usr.removeRole("619581998574469120"); // 1st Year
+        usr.removeRole("619582112936362020"); // 2nd Year
+        usr.removeRole("619582159899852802") // 3rd Year
+        usr.addRole("619582173522952233") //Alumni
+        msg.reply('you are now in the role associated with your year!');
+      } else {
+        msg.reply("that's not a valid year, try between 1-4!");
+      }
     } else {
-      msg.reply("that's not a valid year, try between 1-4!");
+      msg.reply("You must do that in <#619603429379014667>");
     }
   } else if (msg.content.startsWith("!campus ")) { // Assign Campus
-    let txt = msg.content.split(" ");
-    let campus = txt[1];
-    let usr = msg.member;
-    if (campus.toLowerCase() === "trafalgar") {
-      usr.addRole("620641262101463070"); // Trafalgar
-      usr.removeRole("620641321908043798"); // Davis
-      msg.reply("welcome to Trafalgar!");
-    } else if (campus.toLowerCase() === "davis") {
-      usr.removeRole("620641262101463070"); // Trafalgar
-      usr.addRole("620641321908043798"); // Davis
-      msg.reply("welcome to Davis!");
+    if (msg.channel.id === "619603429379014667") {
+      let txt = msg.content.split(" ");
+      let campus = txt[1];
+      let usr = msg.member;
+      if (campus.toLowerCase() === "trafalgar") {
+        usr.addRole("620641262101463070"); // Trafalgar
+        usr.removeRole("620641321908043798"); // Davis
+        msg.reply("welcome to Trafalgar!");
+      } else if (campus.toLowerCase() === "davis") {
+        usr.removeRole("620641262101463070"); // Trafalgar
+        usr.addRole("620641321908043798"); // Davis
+        msg.reply("welcome to Davis!");
+      } else {
+        msg.reply("that is an invalid campus. <:catSad:619611587577249853>");
+      }
     } else {
-      msg.reply("that is an invalid campus. <:catSad:619611587577249853>");
+      msg.reply("You must do that in <#619603429379014667>");
     }
   } else if (msg.content === "!help") { // View Commands
     msg.delete();
