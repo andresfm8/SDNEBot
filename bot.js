@@ -17,24 +17,28 @@ bot.on('message', msg => {
         usr.removeRole("619582112936362020"); // 2nd Year
         usr.removeRole("619582159899852802") // 3rd Year
         usr.removeRole("619582173522952233") //Alumni
+        usr.removeRole("663060867490775071") // Remove Unassigned
         msg.reply('you are now in the role associated with your year!');
       } else if (year === "2") {
         usr.removeRole("619581998574469120"); // 1st Year
         usr.addRole("619582112936362020"); // 2nd Year
         usr.removeRole("619582159899852802") // 3rd Year
         usr.removeRole("619582173522952233") //Alumni
+        usr.removeRole("663060867490775071") // Remove Unassigned
         msg.reply('you are now in the role associated with your year!');
       } else if (year === "3") {
         usr.removeRole("619581998574469120"); // 1st Year
         usr.removeRole("619582112936362020"); // 2nd Year
         usr.addRole("619582159899852802") // 3rd Year
         usr.removeRole("619582173522952233") //Alumni
+        usr.removeRole("663060867490775071") // Remove Unassigned
         msg.reply('you are now in the role associated with your year!');
       } else if (year === "4") {
         usr.removeRole("619581998574469120"); // 1st Year
         usr.removeRole("619582112936362020"); // 2nd Year
         usr.removeRole("619582159899852802") // 3rd Year
         usr.addRole("619582173522952233") //Alumni
+        usr.removeRole("663060867490775071") // Remove Unassigned
         msg.reply('you are now in the role associated with your year!');
       } else {
         msg.reply("that's not a valid year, try between 1-4!");
