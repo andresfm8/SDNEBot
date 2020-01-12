@@ -183,17 +183,52 @@ bot.on('message', msg => {
         msg.delete();
       }, 5000);
     })
-  } else if (msg.content === "!uptime") {
+  } else if (msg.content === "!uptime" && msg.member.highestRole.id == "619581765345869844") {
     let time = process.uptime();
     let uptime = (time + "").toHHMMSS();
     msg.channel.send("I've been awake for `" + uptime + "` now!").then((m) => {
-      var updateMS = 15000;
+      var updateMS = Math.round(Math.random() * (30000 - 5000)) + 5000;;
       setInterval(() => {
         time = process.uptime();
         uptime = (time + "").toHHMMSS();
         m.edit("I've been awake for `" + uptime + "` now!");
-        updateMS = Math.round(Math.random() * (30000 - 5000)) + 5000;
       }, updateMS);
+    });
+  } else if (msg.content.startsWith("!edits") && msg.member.highestRole.id == "619581765345869844") {
+    let txt = msg.content.split(" ");
+    let msgID = txt[1];
+    let fields = [];
+    msg.channel.fetchMessage(msgID).then(edited => {
+      edited.edits.forEach((m, i) => {
+        if (i == 0) {
+          fields.push(
+            {
+              "name": `Latest`,
+              "value": `\`\`\`${m.content}\`\`\``
+            }
+          );
+        } else {
+          fields.push(
+            {
+              "name": `Version ${edited.edits.length - i}`,
+              "value": `\`\`\`${m.content}\`\`\``
+            }
+          );
+        }
+      });
+
+      msg.channel.send({
+        "embed": {
+          "title": "Previous Versions",
+          "color": 15684432,
+          "timestamp": "2020-01-12T01:39:31.010Z",
+          "footer": {
+            "icon_url": "https://cdn.discordapp.com/app-icons/619590949303091211/e9f2a8fadac81f5334a01f641fc6e504.png",
+            "text": "SDNE Bot"
+          },
+          "fields": fields
+        }
+      });
     });
   } else if (msg.content.startsWith("!")) { // If user tries a commond that doesn't exist
     msg.reply("invaild command, use `!help` for a list of commands");

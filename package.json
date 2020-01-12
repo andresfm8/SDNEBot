@@ -9,6 +9,8 @@
   "author": "Jacob Brasil",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^11.5.1"
+    "brain.js": "^2.0.0-alpha.11",
+    "discord.js": "^11.5.1",
+    "file-system": "^2.2.2"
   }
 }
