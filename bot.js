@@ -415,7 +415,8 @@ bot.on('message', msg => {
     fs.writeFileSync('bot_data.json', JSON.stringify(botData))
   } else if (msg.content.startsWith("!")) { // If user tries a commond that doesn't exist
     msg.reply("invaild command, use `!help` for a list of commands");
-  } else if ((msg.channel.id === "619592144390455303" || msg.channel.id === "619584468927250440") && msg.author.id !== "619590949303091211") {
+  } else if ((msg.channel.id === "619592144390455303" || msg.channel.id === "619584468927250440"
+    || msg.attachments.array().length > 0) && msg.author.id !== "619590949303091211") {
     let karmaToggle;
 
     let found = false;
