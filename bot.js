@@ -94,6 +94,14 @@ bot.on('message', msg => {
         {
           name: "View Rules",
           value: "```!rules```"
+        },
+        {
+          name: "View Karma",
+          value: "```!karma\n!karma @username```"
+        },
+        {
+          name: "Toggle Karma",
+          value: "```!karmaToggle```"
         }
         ],
         timestamp: new Date(),
