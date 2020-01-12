@@ -495,6 +495,48 @@ bot.on('message', msg => {
       })
 
     })
+  } else {
+    let karmaToggle;
+
+    let found = false;
+    botData.forEach((e, i) => {
+      if (e.id === msg.author.id) {
+        found = true;
+        karmaToggle = e.karmaToggle;
+      }
+    })
+
+    if (found == false) {
+      botData.push({
+        "id": msg.author.id,
+        "name": msg.author.username,
+        "karma": 0,
+        "karmaToggle": true
+      })
+      karmaToggle = true;
+    }
+
+    if (!karmaToggle)
+      return;
+
+    found = false;
+    botData.forEach((e, i) => {
+      if (e.id === msg.author.id) {
+        found = true;
+        e.karma += msg.content.length * 0.05;
+      }
+    })
+
+    if (found == false) {
+      botData.push({
+        "id": msg.author.id,
+        "name": msg.author.username,
+        "karma": msg.content.length * 0.05,
+        "karmaToggle": true
+      })
+    }
+
+    fs.writeFileSync('bot_data.json', JSON.stringify(botData))
   }
 });
 
