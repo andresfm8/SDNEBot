@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const fs = require('file-system');
 const bot = new Discord.Client();
 
-var botData = JSON.parse(fs.readFileSync('bot_data.json'));
+var botData = JSON.parse(fs.readFileSync(__dirname + '/bot_data.json'));
 
 bot.on('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`);
