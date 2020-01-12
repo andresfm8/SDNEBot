@@ -1,5 +1,8 @@
 const Discord = require('discord.js');
+const fs = require('file-system');
 const bot = new Discord.Client();
+
+var botData = JSON.parse(fs.readFileSync('bot_data.json'));
 
 bot.on('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`);
@@ -194,7 +197,7 @@ bot.on('message', msg => {
         m.edit("I've been awake for `" + uptime + "` now!");
       }, updateMS);
     });
-  } else if (msg.content.startsWith("!edits") && msg.member.highestRole.id == "619581765345869844") {
+  } else if (msg.content.startsWith("!edits ") && msg.member.highestRole.id == "619581765345869844") {
     let txt = msg.content.split(" ");
     let msgID = txt[1];
     let fields = [];
@@ -221,7 +224,6 @@ bot.on('message', msg => {
         "embed": {
           "title": "Previous Versions",
           "color": 15684432,
-          "timestamp": "2020-01-12T01:39:31.010Z",
           "footer": {
             "icon_url": "https://cdn.discordapp.com/app-icons/619590949303091211/e9f2a8fadac81f5334a01f641fc6e504.png",
             "text": "SDNE Bot"
@@ -230,8 +232,260 @@ bot.on('message', msg => {
         }
       });
     });
+  } else if (msg.content.startsWith("!karmaToggle ") && msg.member.highestRole.id == "619581765345869844") {
+    let mention = msg.mentions.users.first();
+
+    let found = false;
+    let setTo;
+    botData.forEach((e, i) => {
+      if (e.id === mention.id) {
+        found = true;
+        e.karmaToggle = !e.karmaToggle;
+        setTo = e.karmaToggle;
+      }
+    })
+
+    if (found == false) {
+      botData.push({
+        "id": mention.id,
+        "name": mention.username,
+        "karma": 0,
+        "karmaToggle": false
+      })
+      setTo = false;
+    }
+
+    msg.channel.send({
+      "embed": {
+        "title": `${mention.username}'s Karma Info`,
+        "color": 9224077,
+        "footer": {
+          "icon_url": `${mention.avatarURL}`,
+          "text": `${mention.username}`
+        },
+        "fields": [
+          {
+            "name": "Karma Toggle",
+            "value": `\`\`\`KarmaToggle: ${setTo}\`\`\``
+          }
+        ]
+      }
+    })
+
+    fs.writeFileSync('bot_data.json', JSON.stringify(botData))
+  } else if (msg.content === "!karmaToggle") {
+    let found = false;
+    let setTo;
+    botData.forEach((e, i) => {
+      if (e.id === msg.author.id) {
+        found = true;
+        e.karmaToggle = !e.karmaToggle;
+        setTo = e.karmaToggle;
+      }
+    })
+
+    if (found == false) {
+      botData.push({
+        "id": msg.author.id,
+        "name": msg.author.username,
+        "karma": 0,
+        "karmaToggle": false
+      })
+      setTo = false;
+    }
+
+    msg.channel.send({
+      "embed": {
+        "title": `${msg.author.username}'s Karma Info`,
+        "color": 9224077,
+        "footer": {
+          "icon_url": `${msg.author.avatarURL}`,
+          "text": `${msg.author.username}`
+        },
+        "fields": [
+          {
+            "name": "Karma Toggle",
+            "value": `\`\`\`KarmaToggle: ${setTo}\`\`\``
+          }
+        ]
+      }
+    })
+
+    fs.writeFileSync('bot_data.json', JSON.stringify(botData))
+  } else if (msg.content.startsWith("!karma ")) {
+    let mention = msg.mentions.users.first();
+
+    let found = false;
+    let setTo;
+    let karmaLvl;
+    botData.forEach((e, i) => {
+      if (e.id === mention.id) {
+        found = true;
+        karmaLvl = e.karma;
+        setTo = e.karmaToggle;
+      }
+    })
+
+    if (found == false) {
+      botData.push({
+        "id": mention.id,
+        "name": mention.username,
+        "karma": 0,
+        "karmaToggle": true
+      })
+      karmaLvl = 0;
+      setTo = true;
+    }
+
+    msg.channel.send({
+      "embed": {
+        "title": `${mention.username}'s Karma Info`,
+        "color": 9224077,
+        "footer": {
+          "icon_url": `${mention.avatarURL}`,
+          "text": `${mention.username}`
+        },
+        "fields": [
+          {
+            "name": "Karma Level",
+            "value": `\`\`\`Karma: ${karmaLvl}\`\`\``
+          },
+          {
+            "name": "Karma Toggle",
+            "value": `\`\`\`KarmaToggle: ${setTo}\`\`\``
+          }
+        ]
+      }
+    })
+
+    fs.writeFileSync('bot_data.json', JSON.stringify(botData))
+  } else if (msg.content === "!karma") {
+    let found = false;
+
+    let setTo;
+    let karmaLvl;
+    botData.forEach((e, i) => {
+      if (e.id === msg.author.id) {
+        found = true;
+        karmaLvl = e.karma;
+        setTo = e.karmaToggle;
+      }
+    })
+
+    if (found == false) {
+      botData.push({
+        "id": msg.author.id,
+        "name": msg.author.username,
+        "karma": 0,
+        "karmaToggle": true
+      })
+      karmaLvl = 0;
+      setTo = true;
+    }
+
+    msg.channel.send({
+      "embed": {
+        "title": `${msg.author.username}'s Karma Info`,
+        "color": 9224077,
+        "footer": {
+          "icon_url": `${msg.author.avatarURL}`,
+          "text": `${msg.author.username}`
+        },
+        "fields": [
+          {
+            "name": "Karma Level",
+            "value": `\`\`\`Karma: ${karmaLvl}\`\`\``
+          },
+          {
+            "name": "Karma Toggle",
+            "value": `\`\`\`KarmaToggle: ${setTo}\`\`\``
+          }
+        ]
+      }
+    })
+
+    fs.writeFileSync('bot_data.json', JSON.stringify(botData))
   } else if (msg.content.startsWith("!")) { // If user tries a commond that doesn't exist
     msg.reply("invaild command, use `!help` for a list of commands");
+  } else if ((msg.channel.id === "619592144390455303" || msg.channel.id === "619584468927250440") && msg.author.id !== "619590949303091211") {
+    let karmaToggle;
+
+    let found = false;
+    botData.forEach((e, i) => {
+      if (e.id === msg.author.id) {
+        found = true;
+        karmaToggle = e.karmaToggle;
+      }
+    })
+
+    if (found == false) {
+      botData.push({
+        "id": msg.author.id,
+        "name": msg.author.username,
+        "karma": 0,
+        "karmaToggle": true
+      })
+      karmaToggle = true;
+    }
+
+    if (!karmaToggle)
+      return;
+
+    msg.react("👍").then(() => msg.react("👎")).then(() => {
+
+      const filter = (reaction, user) => {
+        return (reaction.emoji.name === '👍' || reaction.emoji.name === '👎') && user.id !== "619590949303091211";
+      };
+
+      const collector = msg.createReactionCollector(filter, { time: 300000 });
+
+      collector.on('collect', (reaction, reactionCollector) => {
+
+      });
+
+      collector.on('end', collected => {
+        collected.forEach(reaction => {
+          if (reaction.emoji.name === "👍") {
+            let found = false;
+            botData.forEach((e, i) => {
+              if (e.id === msg.author.id) {
+                found = true;
+                e.karma += 5;
+              }
+            })
+
+            if (found == false) {
+              botData.push({
+                "id": msg.author.id,
+                "name": msg.author.username,
+                "karma": 5,
+                "karmaToggle": true
+              })
+            }
+
+          } else {
+            let found = false;
+            botData.forEach((e, i) => {
+              if (e.id === msg.author.id) {
+                found = true;
+                e.karma -= 2.5;
+              }
+            })
+
+            if (found == false) {
+              botData.push({
+                "id": msg.author.id,
+                "name": msg.author.username,
+                "karma": -2.5,
+                "karmaToggle": true
+              })
+            }
+          }
+        });
+        fs.writeFileSync('bot_data.json', JSON.stringify(botData))
+      })
+
+    })
   }
 });
 
