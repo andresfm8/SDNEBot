@@ -496,7 +496,7 @@ bot.on('message', msg => {
 		}
 
 		let userData = getUser(msg.author)
-		userData.karma += (Math.ceil((msg.content.length * (Math.random() * 0.025)) * 10) / 10)
+		userData.karma += (Math.ceil((msg.content.length * (Math.random() * 0.1)) * 10) / 10)
 		writeUser(msg.author, userData)
 
 	}
