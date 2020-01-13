@@ -469,13 +469,11 @@ bot.on('message', msg => {
 			return
 		}
 
-		if (msg.author.username === 'TimmyRB') {
-			let userData = getUser(msg.author)
-			let output = net.run(msg.content)
-			userData.karma += (Math.floor(((msg.content.length * 0.5) * output.positive ) * 10) / 10 )
-			writeUser(msg.author, userData)
-			console.log(`${msg.content} => ${output.positive} => ${userData.karma}`)
-		}
+		let userData = getUser(msg.author)
+		let output = net.run(msg.content)
+		userData.karma += (Math.floor(((msg.content.length * 0.5) * output.positive) * 10) / 10)
+		writeUser(msg.author, userData)
+		console.log(`${msg.content} => ${output.positive} => ${userData.karma}`)
 
 	}
 
