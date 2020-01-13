@@ -576,7 +576,22 @@ function addKarmaVote(user, msg) {
 		const collector = msg.createReactionCollector(filter, { time: 900000 })
 
 		collector.on('collect', (reaction, reactionCollector) => {
+			let opposite = reaction.emoji.name === '👍' ? '👎' : '👍'
+			let users = reaction.users.array()
 
+			reactionCollector.collected.forEach(r => {
+				let reactUsers = r.users.array()
+
+				if (r.emoji.name === opposite) {
+					for (let i = 0; i < users.length; i++) {
+						for (let j = 0; j < reactUsers.length; j++) {
+							if (users[i].id === reactUsers[j].id) {
+								r.remove(reactUsers[j])
+							}
+						}
+					}
+				}
+			})
 		})
 
 		collector.on('end', collected => {
@@ -595,7 +610,7 @@ function addKarmaVote(user, msg) {
 	})
 }
 
-let hasAttachment = (msg) => {
+hasAttachment = (msg) => {
 	return (msg.attachments.size > 0)
 }
 
