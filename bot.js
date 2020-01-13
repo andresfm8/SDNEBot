@@ -1,6 +1,5 @@
 const Discord = require('discord.js')
 const fs = require('file-system')
-const net = require('./net')
 
 const bot = new Discord.Client()
 
@@ -279,14 +278,6 @@ bot.on('message', msg => {
 
 				return
 			}
-
-			if (msg.content === '!train ') {
-				msg.reply('training started.').then(() => {
-					net.train()
-				})
-
-				return
-			}
 		}
 
 		if (msg.content === '!help') {
@@ -470,10 +461,8 @@ bot.on('message', msg => {
 		}
 
 		let userData = getUser(msg.author)
-		let output = net.run(msg.content)
-		userData.karma += (Math.floor(((msg.content.length * 0.5) * output.positive) * 10) / 10)
+		userData.karma += (Math.ceil((msg.content.length * 0.05) * 10) / 10)
 		writeUser(msg.author, userData)
-		console.log(`${msg.content} => ${output.positive} => ${userData.karma}`)
 
 	}
 
@@ -534,7 +523,7 @@ function writeUser(user, userData) {
 		data.push(userData)
 	}
 
-	fs.writeFileSync('bot_data.json', JSON.stringify(data))
+	fs.writeFileSync(__dirname + '/bot_data.json', JSON.stringify(data))
 }
 
 function addKarmaVote(user, msg) {

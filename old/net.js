@@ -1,6 +1,6 @@
 const Brain = require('brain.js')
 const fs = require('file-system')
-const trainData = require('./training_data')
+const trainData = require('./net/training_data')
 const serializer = require('./net/serializer')
 
 const net = new Brain.NeuralNetwork();
