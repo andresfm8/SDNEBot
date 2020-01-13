@@ -5,7 +5,7 @@
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "train": "node -e 'require(\"./net\").trainNet()'"
+    "start": "node bot.js"
   },
   "author": "Jacob Brasil",
   "license": "ISC",
