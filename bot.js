@@ -244,7 +244,7 @@ bot.on('message', msg => {
 
 			}
 
-			if (msg.content.toLowerCase().startsWith('!karmatoggle ')) {
+			if (msg.content.toLowerCase().startsWith('!karmatoggle')) {
 				let user
 
 				if (msg.mentions.users.size > 0)
@@ -277,6 +277,41 @@ bot.on('message', msg => {
 				})
 
 				return
+			}
+
+			if (msg.content.toLowerCase().startsWith('!cleanup ')) {
+
+				let amount = parseInt(msg.content.split(' ')[1])
+
+				msg.delete()
+
+				if (amount > 100) {
+					msg.reply('you can only delete up to 100 messages at a time.').then((m) => {
+						setTimeout(() => {
+							m.delete()
+						}, 5000)
+					})
+					return
+				}
+
+				msg.channel.bulkDelete(amount)
+					.then(() => {
+						msg.reply(`deleted ${amount} messages.`).then((m) => {
+							setTimeout(() => {
+								m.delete()
+							}, 5000)
+						})
+					})
+					.catch(err => {
+						msg.reply(`${err.message}`).then((m) => {
+							setTimeout(() => {
+								m.delete()
+							}, 5000)
+						})
+					})
+
+				return
+
 			}
 		}
 
