@@ -585,7 +585,7 @@ function addKarmaVote(user, msg) {
 				if (r.emoji.name === opposite) {
 					for (let i = 0; i < users.length; i++) {
 						for (let j = 0; j < reactUsers.length; j++) {
-							if (users[i].id === reactUsers[j].id) {
+							if (users[i].id === reactUsers[j].id && user[i].id !== botID) {
 								r.remove(reactUsers[j])
 							}
 						}
