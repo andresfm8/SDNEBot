@@ -1,5 +1,6 @@
 const Discord = require('discord.js')
 const fs = require('file-system')
+const rmp = require('rmp-api')
 
 const bot = new Discord.Client()
 
@@ -496,6 +497,10 @@ bot.on('message', msg => {
 		}
 
 		let userData = getUser(msg.author)
+
+		if (!userData.karmaToggle)
+			return
+
 		userData.karma += (Math.ceil((msg.content.length * (Math.random() * 0.1)) * 10) / 10)
 		writeUser(msg.author, userData)
 
@@ -604,7 +609,7 @@ function addKarmaVote(user, msg) {
 				}
 			})
 
-			this.author.writeUser(userData)
+			writeUser(user, userData)
 
 		})
 	})
