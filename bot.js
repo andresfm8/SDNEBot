@@ -1,6 +1,5 @@
 const Discord = require('discord.js')
 const fs = require('file-system')
-const rmp = require('rmp-api')
 
 const bot = new Discord.Client()
 
