@@ -98,4 +98,4 @@ public
 .dynamodb/
 
 # Bot Data
-# bot_data.json
+bot_data.json
