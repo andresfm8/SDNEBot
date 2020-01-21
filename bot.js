@@ -344,6 +344,10 @@ bot.on('message', msg => {
 					{
 						name: 'Toggle Karma',
 						value: '```!karmaToggle```'
+					},
+					{
+						name: 'Create a poll with as many emojis as you want',
+						value: '```!poll <messageID ?String> <broadcast ?boolean> <minutes ?Float> <emojiOne ?String> <emojiTwo ?String> ...```'
 					}
 					],
 					timestamp: new Date(),
@@ -472,6 +476,35 @@ bot.on('message', msg => {
 			return
 		}
 
+		if (msg.content.startsWith('!poll ')) { // !poll <messageID ?String> <broadcast ?boolean> <timeoutMin ?Float> <emojiOne ?String> <emojiTwo ?String> ...
+			let options = msg.content.split(' ')
+
+			if (options.length < 6) {
+				msg.reply('required parameters not met').then((m) => {
+					setTimeout(() => {
+						m.delete()
+					}, 5000)
+				})
+			}
+
+			msg.delete()
+
+			let msgID = options[1]
+			let broadcast = (options[2] == 'true')
+			let timeout = parseFloat(options[3])
+			let emojis = []
+
+			for (let i = 4; i < options.length; i++) {
+				emojis.push(options[i])
+			}
+
+			msg.channel.fetchMessage(msgID).then(m => {
+				addPollVote(m, broadcast, timeout, emojis)
+			})
+
+			return
+		}
+
 		msg.reply('that\'s not a vaild command, use `!help` to see commands you can use!')
 
 	} else {
@@ -500,7 +533,10 @@ bot.on('message', msg => {
 		if (!userData.karmaToggle)
 			return
 
-		userData.karma += (Math.ceil((msg.content.length * (Math.random() * 0.1)) * 10) / 10)
+		if (msg.content.length < Math.round(Math.random() * 5))
+			return;
+
+		userData.karma += (Math.ceil(Math.random() * 0.5) / (msg.content.length / 100))
 		writeUser(msg.author, userData)
 
 	}
@@ -577,7 +613,7 @@ function addKarmaVote(user, msg) {
 			return (reaction.emoji.name === '👍' || reaction.emoji.name === '👎') && user.id !== botID
 		}
 
-		const collector = msg.createReactionCollector(filter, { time: 3600000 /* 1 Hour */ })
+		const collector = msg.createReactionCollector(filter, { time: 900000 /* 15 Minutes */ })
 
 		collector.on('collect', (reaction, reactionCollector) => {
 			let opposite = reaction.emoji.name === '👍' ? '👎' : '👍'
@@ -611,6 +647,40 @@ function addKarmaVote(user, msg) {
 			writeUser(user, userData)
 
 		})
+	})
+}
+
+function addPollVote(msg, broadcast, timeout, emojis) {
+	timeout *= 60000
+
+	emojis.forEach(async (emoji) => {
+		await msg.react(emoji)
+	})
+
+	const filter = (reaction, user) => {
+		return emojis.includes(reaction.emoji.name) && user.id !== botID
+	}
+
+	const collector = msg.createReactionCollector(filter, { time: timeout })
+
+	collector.on('collect', (reaction, reactionCollector) => {
+
+	})
+
+	collector.on('end', collected => {
+		let max = [0, '']
+
+		collected.forEach(reaction => {
+			if (max[0] < reaction.count) {
+				max[0] = reaction.count
+				max[1] = reaction.emoji.name
+			}
+		})
+
+		if (broadcast)
+			msg.channel.send(`Time's up!\n${max[1]} is the winner with ${max[0]} votes!`)
+		else
+			msg.channel.send(`Time's up!`)
 	})
 }
 
