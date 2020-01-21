@@ -333,33 +333,33 @@ bot.on('message', msg => {
 					}
 				})
 
-				msg.channel.send({
-					'embed': {
-						'title': 'Karma Scoreboard',
-						'color': 15684432,
-						'timestamp': Date.now(),
-						'footer': {
-							'icon_url': bot.user.avatarURL,
-							'text': bot.user.username
-						},
-						'fields': fields
-					}
-				}).then(m => {
-					setInterval(() => {
-						let fields = []
-						let data = getAllUsers()
+				let embed = new Discord.RichEmbed({
+					'title': 'Karma Scoreboard',
+					'color': 15684432,
+					'timestamp': Date.now(),
+					'footer': {
+						'icon_url': bot.user.avatarURL,
+						'text': bot.user.username
+					},
+					'fields': fields
+				})
 
-						data.forEach((e, i) => {
-							if (e.karma > 0) {
-								fields.push({
-									name: `#${i + 1} ${e.name}`,
-									value: `\`\`\`Karma: ${Math.floor(e.karma * 100) / 100}\`\`\``
-								})
-							}
-						})
+				msg.channel.send(embed)
+					.then(m => {
+						setInterval(() => {
+							let fields = []
+							let data = getAllUsers()
 
-						m.edit({
-							'embed': {
+							data.forEach((e, i) => {
+								if (e.karma > 0) {
+									fields.push({
+										name: `#${i + 1} ${e.name}`,
+										value: `\`\`\`Karma: ${Math.floor(e.karma * 100) / 100}\`\`\``
+									})
+								}
+							})
+
+							let newEmbed = new Discord.RichEmbed({
 								'title': 'Karma Scoreboard',
 								'color': 15684432,
 								'timestamp': Date.now(),
@@ -368,10 +368,11 @@ bot.on('message', msg => {
 									'text': bot.user.username
 								},
 								'fields': fields
-							}
-						})
-					}, 5 * 60000)
-				})
+							})
+
+							m.edit(newEmbed).catch(e => console.error(e))
+						}, 15 * 60000)
+					})
 
 				setInterval(() => {
 
