@@ -328,7 +328,7 @@ bot.on('message', msg => {
 					if (e.karma > 0) {
 						fields.push({
 							name: `#${i + 1} ${e.name}`,
-							value: `\`\`\`Karma: ${e.karma}\`\`\``
+							value: `\`\`\`Karma: ${Math.floor(e.karma * 100) / 100}\`\`\``
 						})
 					}
 				})
@@ -593,6 +593,24 @@ bot.on('message', msg => {
 		if (hasAttachment(msg) || hasURL(msg)) {
 			addKarmaVote(msg.author, msg)
 			return
+		}
+
+		if (msg.content.includes('boomer')) {
+			msg.react('🆗').then(() => {
+				msg.react('🇧').then(() => {
+					msg.react('🇴').then(() => {
+						msg.react('🅾').then(() => {
+							msg.react('🇲').then(() => {
+								msg.react('🇪').then(() => {
+									msg.react('🇷').then(() => {
+								
+									})
+								})
+							})
+						})
+					})
+				})
+			})
 		}
 
 		let userData = getUser(msg.author)
