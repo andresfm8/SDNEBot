@@ -602,7 +602,7 @@ bot.on('message', msg => {
 		if (msg.content.length < Math.round(Math.random() * 5))
 			return;
 
-		userData.karma += (Math.ceil(Math.random() * 0.5) / (msg.content.length / 100))
+		userData.karma += (Math.random() * 0.025) / (msg.content.length / 100)
 		writeUser(msg.author, userData)
 
 	}
