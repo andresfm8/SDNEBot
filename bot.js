@@ -48,6 +48,7 @@ bot.on('guildMemberAdd', member => {
 
 // When user sends message to any channel shared with SDNE Bot
 bot.on('message', msg => {
+	msg.content = msg.content.toLowerCase()
 
 	// Ignore Bot Messages
 	if (msg.author.id === botID)
@@ -110,7 +111,7 @@ bot.on('message', msg => {
 
 			} else if (msg.content.startsWith('!campus ')) {
 
-				let campus = msg.content.split(' ')[1].toLowerCase()
+				let campus = msg.content.split(' ')[1]
 				let user = msg.member
 
 				switch (campus) {
@@ -244,7 +245,7 @@ bot.on('message', msg => {
 
 			}
 
-			if (msg.content.toLowerCase().startsWith('!karmatoggle')) {
+			if (msg.content.startsWith('!karmatoggle')) {
 				let user
 
 				if (msg.mentions.users.size > 0)
@@ -279,7 +280,7 @@ bot.on('message', msg => {
 				return
 			}
 
-			if (msg.content.toLowerCase().startsWith('!cleanup ')) {
+			if (msg.content.startsWith('!cleanup ')) {
 
 				let amount = parseInt(msg.content.split(' ')[1])
 
@@ -312,6 +313,71 @@ bot.on('message', msg => {
 
 				return
 
+			}
+
+			if (msg.content === '!scoreboard') {
+				msg.delete()
+
+				let fields = []
+				let data = getAllUsers()
+
+				data.forEach((e, i) => {
+					if (i >= 10)
+						return
+
+					if (e.karma > 0) {
+						fields.push({
+							name: `#${i + 1} ${e.name}`,
+							value: `\`\`\`Karma: ${e.karma}\`\`\``
+						})
+					}
+				})
+
+				msg.channel.send({
+					'embed': {
+						'title': 'Karma Scoreboard',
+						'color': 15684432,
+						'timestamp': Date.now(),
+						'footer': {
+							'icon_url': bot.user.avatarURL,
+							'text': bot.user.username
+						},
+						'fields': fields
+					}
+				}).then(m => {
+					setInterval(() => {
+						let fields = []
+						let data = getAllUsers()
+
+						data.forEach((e, i) => {
+							if (e.karma > 0) {
+								fields.push({
+									name: `#${i + 1} ${e.name}`,
+									value: `\`\`\`Karma: ${Math.floor(e.karma * 100) / 100}\`\`\``
+								})
+							}
+						})
+
+						m.edit({
+							'embed': {
+								'title': 'Karma Scoreboard',
+								'color': 15684432,
+								'timestamp': Date.now(),
+								'footer': {
+									'icon_url': bot.user.avatarURL,
+									'text': bot.user.username
+								},
+								'fields': fields
+							}
+						})
+					}, 5 * 60000)
+				})
+
+				setInterval(() => {
+
+				}, 5 * 60000)
+
+				return
 			}
 		}
 
@@ -413,7 +479,7 @@ bot.on('message', msg => {
 
 		}
 
-		if (msg.content.toLowerCase() === '!karmatoggle') {
+		if (msg.content === '!karmatoggle') {
 			let data = getUser(msg.author)
 
 			data.karmaToggle = !data.karmaToggle
@@ -463,7 +529,7 @@ bot.on('message', msg => {
 					'fields': [
 						{
 							'name': 'Karma Level',
-							'value': `\`\`\`Karma: ${Math.floor(data.karma * 10) / 10}\`\`\``
+							'value': `\`\`\`Karma: ${Math.floor(data.karma * 100) / 100}\`\`\``
 						},
 						{
 							'name': 'Karma Toggle',
@@ -569,6 +635,11 @@ let getUser = (user) => {
 	return userData
 }
 
+let getAllUsers = () => {
+	let data = JSON.parse(fs.readFileSync(__dirname + '/bot_data.json'))
+	return data
+}
+
 // See if User alreadly exists in JSON
 let userExists = (user) => {
 	let data = JSON.parse(fs.readFileSync(__dirname + '/bot_data.json'))
@@ -597,6 +668,12 @@ function writeUser(user, userData) {
 	} else {
 		data.push(userData)
 	}
+
+	data.sort((a, b) => {
+		return a.karma - b.karma
+	})
+
+	data.reverse()
 
 	fs.writeFileSync(__dirname + '/bot_data.json', JSON.stringify(data))
 }
