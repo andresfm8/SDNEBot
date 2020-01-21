@@ -322,13 +322,11 @@ bot.on('message', msg => {
 				let data = getAllUsers()
 
 				data.forEach((e, i) => {
-					if (i >= 10)
-						return
-
-					if (e.karma > 0) {
+					let karma = Math.floor(e.karma * 100) / 100;
+					if (karma > 0) {
 						fields.push({
 							name: `#${i + 1} ${e.name}`,
-							value: `\`\`\`Karma: ${Math.floor(e.karma * 100) / 100}\`\`\``
+							value: `\`\`\`Karma: ${karma}\`\`\``
 						})
 					}
 				})
@@ -351,10 +349,11 @@ bot.on('message', msg => {
 							let data = getAllUsers()
 
 							data.forEach((e, i) => {
-								if (e.karma > 0) {
+								let karma = Math.floor(e.karma * 100) / 100;
+								if (karma = 0) {
 									fields.push({
 										name: `#${i + 1} ${e.name}`,
-										value: `\`\`\`Karma: ${Math.floor(e.karma * 100) / 100}\`\`\``
+										value: `\`\`\`Karma: ${karma}\`\`\``
 									})
 								}
 							})
@@ -596,20 +595,14 @@ bot.on('message', msg => {
 		}
 
 		if (msg.content.includes('boomer')) {
-			msg.react('🆗').then(() => {
-				msg.react('🇧').then(() => {
-					msg.react('🇴').then(() => {
-						msg.react('🅾').then(() => {
-							msg.react('🇲').then(() => {
-								msg.react('🇪').then(() => {
-									msg.react('🇷').then(() => {
-								
-									})
-								})
-							})
-						})
-					})
-				})
+			(async () => {
+				await msg.react('🆗')
+				await msg.react('🇧')
+				await msg.react('🇴')
+				await msg.react('🅾')
+				await msg.react('🇲')
+				await msg.react('🇪')
+				await msg.react('🇷')
 			})
 		}
 
