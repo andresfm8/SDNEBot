@@ -323,7 +323,7 @@ bot.on('message', msg => {
 
 				data.forEach((e, i) => {
 					let karma = Math.floor(e.karma * 100) / 100;
-					if (karma > 0) {
+					if (karma === 0) {
 						fields.push({
 							name: `#${i + 1} ${e.name}`,
 							value: `\`\`\`Karma: ${karma}\`\`\``
@@ -350,7 +350,7 @@ bot.on('message', msg => {
 
 							data.forEach((e, i) => {
 								let karma = Math.floor(e.karma * 100) / 100;
-								if (karma = 0) {
+								if (karma === 0) {
 									fields.push({
 										name: `#${i + 1} ${e.name}`,
 										value: `\`\`\`Karma: ${karma}\`\`\``
