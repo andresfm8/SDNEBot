@@ -520,6 +520,7 @@ bot.on('message', msg => {
 			let tranString = 'No Transactions'
 
 			if (data.transactions.length !== 0) {
+				tranString = ''
 				for (let i = data.transactions.length - 1; i > data.transactions.length - 6; i--) {
 					tranString += (data.transactions[i] !== undefined ? `${data.transactions[i]}\n` : '')
 				}
