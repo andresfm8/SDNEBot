@@ -517,6 +517,12 @@ bot.on('message', msg => {
 
 			let data = getUser(user)
 
+			let tranString = ''
+
+			for (let i = data.transactions.length - 1; i > data.transactions.length - 6; i--) {
+				tranString += (data.transactions[i] !== undefined ?`${data.transactions[i]}\n` : '')
+			}
+
 			msg.channel.send({
 				'embed': {
 					'title': `${data.name}'s Karma Info`,
@@ -534,6 +540,10 @@ bot.on('message', msg => {
 						{
 							'name': 'Karma Toggle',
 							'value': `\`\`\`KarmaToggle: ${data.karmaToggle}\`\`\``
+						},
+						{
+							'name': 'Karma Transactions',
+							'value': `\`\`\`${tranString}\`\`\``
 						}
 					]
 				}
@@ -628,7 +638,8 @@ let getUser = (user) => {
 		'id': user.id,
 		'name': user.username,
 		'karma': 0,
-		'karmaToggle': true
+		'karmaToggle': true,
+		'transactions': []
 	}
 
 	data.forEach((e, i) => {
@@ -637,7 +648,8 @@ let getUser = (user) => {
 				'id': e.id,
 				'name': e.name,
 				'karma': e.karma,
-				'karmaToggle': e.karmaToggle
+				'karmaToggle': e.karmaToggle,
+				'transactions': e.transactions
 			}
 		}
 	})
@@ -674,6 +686,7 @@ function writeUser(user, userData) {
 				e.name = userData.name
 				e.karma = userData.karma
 				e.karmaToggle = userData.karmaToggle
+				e.transactions = (userData.transactions !== undefined ? userData.transactions : [])
 			}
 		})
 	} else {
@@ -694,6 +707,8 @@ function modKarma(user, userData, amount, source) {
 		userData.transactions = []
 
 	let type = '';
+	userData.karma += amount
+	amount = Math.floor(amount * 100) / 100
 
 	if (amount > 0)
 		type = 'Added'
@@ -703,7 +718,7 @@ function modKarma(user, userData, amount, source) {
 		return
 
 	userData.transactions.push(`${type} ${Math.abs(amount)} from ${source.toString()}`)
-	userData.karma += amount
+	
 
 	writeUser(user, userData)
 }
@@ -720,7 +735,7 @@ function addKarmaVote(user, msg) {
 			return (reaction.emoji.name === '👍' || reaction.emoji.name === '👎') && user.id !== botID
 		}
 
-		const collector = msg.createReactionCollector(filter, { time: 5 * 60000 })
+		const collector = msg.createReactionCollector(filter, { time: 15 * 60000 })
 
 		collector.on('collect', (reaction, reactionCollector) => {
 			let opposite = reaction.emoji.name === '👍' ? '👎' : '👍'
