@@ -702,7 +702,7 @@ function addKarmaVote(user, msg) {
 			return (reaction.emoji.name === '👍' || reaction.emoji.name === '👎') && user.id !== botID
 		}
 
-		const collector = msg.createReactionCollector(filter, { time: 900000 /* 15 Minutes */ })
+		const collector = msg.createReactionCollector(filter, { time: 15 * 60000 })
 
 		collector.on('collect', (reaction, reactionCollector) => {
 			let opposite = reaction.emoji.name === '👍' ? '👎' : '👍'
