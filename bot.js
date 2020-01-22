@@ -614,8 +614,7 @@ bot.on('message', msg => {
 		if (msg.content.length < Math.round(Math.random() * 5))
 			return;
 
-		userData.karma += (Math.random() * 0.025) / (msg.content.length / 100)
-		writeUser(msg.author, userData)
+		modKarma(msg.author, userData, (Math.random() * 0.025) / (msg.content.length / 100), 'Message Karma')
 
 	}
 
@@ -690,6 +689,25 @@ function writeUser(user, userData) {
 	fs.writeFileSync(__dirname + '/bot_data.json', JSON.stringify(data))
 }
 
+function modKarma(user, userData, amount, source) {
+	if (userData.transactions == undefined)
+		userData.transactions = []
+
+	let type = '';
+
+	if (amount > 0)
+		type = 'Added'
+	else if (amount < 0)
+		type = 'Removed'
+	else
+		return
+
+	userData.transactions.push(`${type} ${Math.abs(amount)} from ${source.toString()}`)
+	userData.karma += amount
+
+	writeUser(user, userData)
+}
+
 function addKarmaVote(user, msg) {
 	let userData = getUser(user)
 
@@ -702,7 +720,7 @@ function addKarmaVote(user, msg) {
 			return (reaction.emoji.name === '👍' || reaction.emoji.name === '👎') && user.id !== botID
 		}
 
-		const collector = msg.createReactionCollector(filter, { time: 15 * 60000 })
+		const collector = msg.createReactionCollector(filter, { time: 5 * 60000 })
 
 		collector.on('collect', (reaction, reactionCollector) => {
 			let opposite = reaction.emoji.name === '👍' ? '👎' : '👍'
@@ -724,16 +742,20 @@ function addKarmaVote(user, msg) {
 		})
 
 		collector.on('end', collected => {
+			let plusCount = 0
+			let minusCount = 0
 
 			collected.forEach(reaction => {
 				if (reaction.emoji.name === '👍') {
-					userData.karma += 5
+					plusCount = reaction.count - 1
 				} else {
-					userData.karma -= 2.5
+					minusCount = reaction.count - 1
 				}
 			})
 
-			writeUser(user, userData)
+			let total = (5 * plusCount) - (2.5 * minusCount)
+
+			modKarma(user, userData, total, 'Attachment Karma')
 
 		})
 	})
@@ -773,7 +795,7 @@ function addPollVote(msg, broadcast, timeout, emojis) {
 	})
 }
 
-hasAttachment = (msg) => {
+let hasAttachment = (msg) => {
 	return (msg.attachments.size > 0)
 }
 
