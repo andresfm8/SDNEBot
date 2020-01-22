@@ -518,8 +518,9 @@ bot.on('message', msg => {
 			let data = getUser(user)
 
 			let tranString = ''
+			let transactions = (data.transactions !== undefined ? data.transactions.length - 1 : -500)
 
-			for (let i = data.transactions.length - 1; i > data.transactions.length - 6; i--) {
+			for (let i = transactions; i > transactions - 5; i--) {
 				tranString += (data.transactions[i] !== undefined ?`${data.transactions[i]}\n` : '')
 			}
 
