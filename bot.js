@@ -333,7 +333,7 @@ bot.on('message', msg => {
 
 				let embed = new Discord.RichEmbed({
 					'title': 'Karma Scoreboard',
-					'color': 15684432,
+					'color': 9224077,
 					'timestamp': Date.now(),
 					'footer': {
 						'icon_url': bot.user.avatarURL,
@@ -360,7 +360,7 @@ bot.on('message', msg => {
 
 							let newEmbed = new Discord.RichEmbed({
 								'title': 'Karma Scoreboard',
-								'color': 15684432,
+								'color': 9224077,
 								'timestamp': Date.now(),
 								'footer': {
 									'icon_url': bot.user.avatarURL,
