@@ -517,15 +517,12 @@ bot.on('message', msg => {
 
 			let data = getUser(user)
 
-			let tranString = ''
+			let tranString = 'No Transactions'
 
-			if (data.transactions.length === 0) {
-				writeUser(user, data)
-				return
-			}
-
-			for (let i = data.transactions.length - 1; i > data.transactions.length - 6; i--) {
-				tranString += (data.transactions[i] !== undefined ?`${data.transactions[i]}\n` : ' ')
+			if (data.transactions.length !== 0) {
+				for (let i = data.transactions.length - 1; i > data.transactions.length - 6; i--) {
+					tranString += (data.transactions[i] !== undefined ? `${data.transactions[i]}\n` : '')
+				}
 			}
 
 			msg.channel.send({
@@ -723,7 +720,7 @@ function modKarma(user, userData, amount, source) {
 		return
 
 	userData.transactions.push(`${type} ${Math.abs(amount)} from ${source.toString()}`)
-	
+
 
 	writeUser(user, userData)
 }
