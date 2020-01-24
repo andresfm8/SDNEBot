@@ -445,7 +445,7 @@ bot.on('message', msg => {
 				let user = msg.mentions.members.first()
 				msg.delete()
 
-				if (user.id === botID || user.highestRole === adminRole) {
+				if (user.id == botID || user.highestRole == adminRole) {
 					msg.reply('cannot mute an admin or bot')
 					return
 				}
