@@ -443,6 +443,7 @@ bot.on('message', msg => {
 
 			if (msg.content.startsWith('!mute ')) {
 				let user = msg.mentions.members.first()
+				msg.delete()
 
 				if (user.id === botID || user.highestRole === adminRole) {
 					msg.reply('cannot mute an admin or bot')
@@ -894,7 +895,7 @@ function addPollVote(msg, broadcast, timeout, emojis) {
 }
 
 function delMessage(msg) {
-	bot.channels.get(deleted).sendMessage(`${msg.author.username} **said:** ${msg.content} **in** <#${msg.channel.id}>`)
+	bot.channels.get(deleted).send(`${msg.author.username} **said:** ${msg.content} **in** <#${msg.channel.id}>`)
 	msg.delete()
 }
 
