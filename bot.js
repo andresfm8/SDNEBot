@@ -450,7 +450,7 @@ bot.on('message', msg => {
 					return
 				}
 
-				let data = getUser(user)
+				let data = getUser(user.user)
 				let mutedStatus = !data.muted
 				data.muted = !data.muted
 				msg.channel.sendMessage(`Set <@${user.id}>'s muted status to \`${mutedStatus}\``)
