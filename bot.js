@@ -442,10 +442,12 @@ bot.on('message', msg => {
 			}
 
 			if (msg.content.startsWith('!mute ')) {
-				let user = msg.mentions.users.first()
+				let user = msg.mentions.members.first()
 
-				if (user.id === botID || user.highestRole === adminRole)
+				if (user.id === botID || user.highestRole === adminRole) {
+					msg.reply('cannot mute an admin or bot')
 					return
+				}
 
 				let data = getUser(user)
 				let mutedStatus = !data.muted
