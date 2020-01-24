@@ -23,6 +23,7 @@ const everyone = '619560877405896714'
 const assign_year = '619603429379014667'
 const rules_info = '619585833636200449'
 const support = '628315463402913793'
+const deleted = '670103982903132201'
 
 //#endregion
 
@@ -53,6 +54,12 @@ bot.on('message', msg => {
 	// Ignore Bot Messages
 	if (msg.author.id === botID)
 		return
+
+	let mutedData = getUser(msg.author)
+	if (mutedData.muted) {
+		delMessage(msg)
+		return
+	}
 
 	if (msg.content.startsWith('!')) {
 		// Message is a command
@@ -138,7 +145,7 @@ bot.on('message', msg => {
 
 			} else {
 
-				msg.delete()
+				delMessage(msg)
 				msg.reply(`it looks like you have formatted that command incorrectly, see <#${rules_info}> for more information or ask for help in <#${support}>.`).then(m => {
 					setTimeout(() => {
 						m.delete()
@@ -152,6 +159,60 @@ bot.on('message', msg => {
 
 		if (msg.member.highestRole.id === adminRole) {
 			// Message is by Admin
+			if (msg.content === '!help') {
+
+				msg.channel.send({
+					embed: {
+						color: 4886754,
+						title: 'Help Menu',
+						fields: [{
+							name: 'Assign Year Roles',
+							value: '```!year <year>\nUse \'4\' if you are Alumni```'
+						},
+						{
+							name: 'Assign Campus',
+							value: '```!campus <campus name>```'
+						},
+						{
+							name: 'View Help Menu',
+							value: '```!help```'
+						},
+						{
+							name: 'View Rules',
+							value: '```!rules```'
+						},
+						{
+							name: 'View Karma',
+							value: '```!karma\n!karma @username```'
+						},
+						{
+							name: 'Toggle Karma',
+							value: '```!karmaToggle```'
+						},
+						{
+							name: 'Create a poll with as many emojis as you want',
+							value: '```!poll <messageID ?String> <broadcast ?boolean> <minutes ?Float> <emojiOne ?String> <emojiTwo ?String> ...```'
+						},
+						{
+							name: 'Generate Bot Invite',
+							value: '```!invite```'
+						},
+						{
+							name: 'Give ',
+							value: '```!invite```'
+						}
+						],
+						timestamp: new Date(),
+						footer: {
+							icon_url: bot.user.avatarURL,
+							text: 'SDNE Bot'
+						}
+					}
+				})
+
+				return
+			}
+
 			if (msg.content === '!invite') {
 
 				msg.guild.channels.get('id', rules_info).createInvite({
@@ -379,6 +440,20 @@ bot.on('message', msg => {
 
 				return
 			}
+
+			if (msg.content.startsWith('!mute ')) {
+				let user = msg.mentions.users.first()
+
+				if (user.id === botID || user.highestRole === adminRole)
+					return
+
+				let data = getUser(user)
+				let mutedStatus = !data.muted
+				data.muted = !data.muted
+				msg.channel.sendMessage(`Set <@${user.id}>'s muted status to \`${mutedStatus}\``)
+				writeUser(user, data)
+				return
+			}
 		}
 
 		if (msg.content === '!help') {
@@ -584,14 +659,16 @@ bot.on('message', msg => {
 			return
 		}
 
-		msg.reply('that\'s not a vaild command, use `!help` to see commands you can use!')
+		if (!mutedData.muted)
+			msg.reply('that\'s not a vaild command, use `!help` to see commands you can use!')
 
 	} else {
 		// Message is a normal message
+		let userData = getUser(msg.author)
 
 		if (msg.channel.id === assign_year) {
 
-			msg.delete()
+			delMessage(msg)
 			msg.reply(`this channel is only for assigning your year and campus, see <#${rules_info}> for more information or ask for help in <#${support}>.`).then(m => {
 				setTimeout(() => {
 					m.delete()
@@ -619,8 +696,6 @@ bot.on('message', msg => {
 			})
 		}
 
-		let userData = getUser(msg.author)
-
 		if (!userData.karmaToggle)
 			return
 
@@ -642,6 +717,7 @@ let getUser = (user) => {
 		'name': user.username,
 		'karma': 0,
 		'karmaToggle': true,
+		'muted': false,
 		'transactions': []
 	}
 
@@ -652,6 +728,7 @@ let getUser = (user) => {
 				'name': e.name,
 				'karma': e.karma,
 				'karmaToggle': e.karmaToggle,
+				'muted': (e.muted !== undefined ? e.muted : false),
 				'transactions': e.transactions
 			}
 		}
@@ -689,6 +766,7 @@ function writeUser(user, userData) {
 				e.name = userData.name
 				e.karma = userData.karma
 				e.karmaToggle = userData.karmaToggle
+				e.muted = userData.muted
 				e.transactions = (userData.transactions !== undefined ? userData.transactions : [])
 			}
 		})
@@ -811,6 +889,11 @@ function addPollVote(msg, broadcast, timeout, emojis) {
 		else
 			msg.channel.send(`Time's up!`)
 	})
+}
+
+function delMessage(msg) {
+	bot.channels.get(deleted).sendMessage(`${msg.author.username} **said:** ${msg.content} **in** <#${msg.channel.id}>`)
+	msg.delete()
 }
 
 let hasAttachment = (msg) => {
