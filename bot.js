@@ -37,6 +37,9 @@ bot.on('ready', () => {
 
 // Message is deleted
 bot.on('messageDelete', msg => {
+	if (msg.channel.id === '670103982903132201')
+		return
+
 	let server = bot.guilds.get('619560877405896714')
 	server.channels.get('670103982903132201').send(`**${msg.author}'s message in ${msg.channel} was deleted:** \`\`\`${msg.content}\`\`\``)
 })
