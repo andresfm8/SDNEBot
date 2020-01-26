@@ -32,6 +32,13 @@ bot.on('ready', () => {
 	console.log(`Logged in as ${bot.user.tag}!`)
 	bot.user.setActivity('!help commands', { type: 'LISTENING' })
 	botID = bot.user.id
+	bot.guilds.get('619560877405896714').setSplash()
+})
+
+// Message is deleted
+bot.on('messageDelete', msg => {
+	let server = bot.guilds.get('619560877405896714')
+	server.channels.get('670103982903132201').send(`**${msg.author}'s message in ${msg.channel} was deleted:** \`\`\`${msg.content}\`\`\``)
 })
 
 // When user joins Discord server
@@ -57,7 +64,7 @@ bot.on('message', msg => {
 
 	let mutedData = getUser(msg.author)
 	if (mutedData.muted) {
-		delMessage(msg)
+		msg.delete()
 		return
 	}
 
@@ -145,7 +152,7 @@ bot.on('message', msg => {
 
 			} else {
 
-				delMessage(msg)
+				msg.delete()
 				msg.reply(`it looks like you have formatted that command incorrectly, see <#${rules_info}> for more information or ask for help in <#${support}>.`).then(m => {
 					setTimeout(() => {
 						m.delete()
@@ -186,11 +193,7 @@ bot.on('message', msg => {
 							value: '```!karma\n!karma @username```'
 						},
 						{
-							name: 'Toggle Karma',
-							value: '```!karmaToggle```'
-						},
-						{
-							name: 'Create a poll with as many emojis as you want',
+							name: 'Create a poll with as many standard emojis as you want',
 							value: '```!poll <messageID ?String> <broadcast ?boolean> <minutes ?Float> <emojiOne ?String> <emojiTwo ?String> ...```'
 						},
 						{
@@ -198,8 +201,32 @@ bot.on('message', msg => {
 							value: '```!invite```'
 						},
 						{
-							name: 'Give ',
-							value: '```!invite```'
+							name: 'Give Unassigned Roles',
+							value: '```!reassign```'
+						},
+						{
+							name: 'Get Bot Uptime',
+							value: '```!uptime```'
+						},
+						{
+							name: 'Get Message Edits',
+							value: '```!edits <messageId>```'
+						},
+						{
+							name: 'Toggle Karma',
+							value: '```!karmaToggle\n!karmaToggle <@user>```'
+						},
+						{
+							name: 'Cleanup Messages',
+							value: '```!cleanup <amount<=100>```'
+						},
+						{
+							name: 'Get Updating Scoreboard',
+							value: '```!scoreboard```'
+						},
+						{
+							name: 'Toggle User Muted Status',
+							value: '```!toggleMute <@user>```'
 						}
 						],
 						timestamp: new Date(),
@@ -441,7 +468,36 @@ bot.on('message', msg => {
 				return
 			}
 
-			if (msg.content.startsWith('!mute ')) {
+			if (msg.content.startsWith('!poll ')) { // !poll <messageID ?String> <broadcast ?boolean> <timeoutMin ?Float> <emojiOne ?String> <emojiTwo ?String> ...
+				let options = msg.content.split(' ')
+
+				if (options.length < 6) {
+					msg.reply('required parameters not met').then((m) => {
+						setTimeout(() => {
+							m.delete()
+						}, 5000)
+					})
+				}
+
+				msg.delete()
+
+				let msgID = options[1]
+				let broadcast = (options[2] == 'true')
+				let timeout = parseFloat(options[3])
+				let emojis = []
+
+				for (let i = 4; i < options.length; i++) {
+					emojis.push(options[i])
+				}
+
+				msg.channel.fetchMessage(msgID).then(m => {
+					addPollVote(m, broadcast, timeout, emojis)
+				})
+
+				return
+			}
+
+			if (msg.content.startsWith('!togglemute ')) {
 				let user = msg.mentions.users.first()
 				msg.delete()
 
@@ -488,10 +544,6 @@ bot.on('message', msg => {
 					{
 						name: 'Toggle Karma',
 						value: '```!karmaToggle```'
-					},
-					{
-						name: 'Create a poll with as many emojis as you want',
-						value: '```!poll <messageID ?String> <broadcast ?boolean> <minutes ?Float> <emojiOne ?String> <emojiTwo ?String> ...```'
 					}
 					],
 					timestamp: new Date(),
@@ -633,37 +685,7 @@ bot.on('message', msg => {
 			return
 		}
 
-		if (msg.content.startsWith('!poll ')) { // !poll <messageID ?String> <broadcast ?boolean> <timeoutMin ?Float> <emojiOne ?String> <emojiTwo ?String> ...
-			let options = msg.content.split(' ')
-
-			if (options.length < 6) {
-				msg.reply('required parameters not met').then((m) => {
-					setTimeout(() => {
-						m.delete()
-					}, 5000)
-				})
-			}
-
-			msg.delete()
-
-			let msgID = options[1]
-			let broadcast = (options[2] == 'true')
-			let timeout = parseFloat(options[3])
-			let emojis = []
-
-			for (let i = 4; i < options.length; i++) {
-				emojis.push(options[i])
-			}
-
-			msg.channel.fetchMessage(msgID).then(m => {
-				addPollVote(m, broadcast, timeout, emojis)
-			})
-
-			return
-		}
-
-		if (!mutedData.muted)
-			msg.reply('that\'s not a vaild command, use `!help` to see commands you can use!')
+		msg.reply('that\'s not a vaild command, use `!help` to see commands you can use!')
 
 	} else {
 		// Message is a normal message
@@ -671,7 +693,7 @@ bot.on('message', msg => {
 
 		if (msg.channel.id === assign_year) {
 
-			delMessage(msg)
+			msg.delete()
 			msg.reply(`this channel is only for assigning your year and campus, see <#${rules_info}> for more information or ask for help in <#${support}>.`).then(m => {
 				setTimeout(() => {
 					m.delete()
@@ -892,11 +914,6 @@ function addPollVote(msg, broadcast, timeout, emojis) {
 		else
 			msg.channel.send(`Time's up!`)
 	})
-}
-
-function delMessage(msg) {
-	bot.channels.get(deleted).send(`${msg.author.username} **said:** ${msg.content} **in** <#${msg.channel.id}>`)
-	msg.delete()
 }
 
 let hasAttachment = (msg) => {
