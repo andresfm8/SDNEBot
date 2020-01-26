@@ -45,7 +45,7 @@ bot.on('messageDelete', msg => {
 })
 
 bot.on('messageUpdate', (oldMsg, newMsg) => {
-	if (newMsg.author.id === botID)
+	if (newMsg.author.id === botID || newMsg.embeds.length > oldMsg.embeds.length)
 		return
 
 	let server = bot.guilds.get('619560877405896714')
