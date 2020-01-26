@@ -44,6 +44,14 @@ bot.on('messageDelete', msg => {
 	server.channels.get('670103982903132201').send(`**${msg.author}'s message in ${msg.channel} was deleted:** \`\`\`${msg.content}\`\`\``)
 })
 
+bot.on('messageUpdate', (oldMsg, newMsg) => {
+	if (newMsg.author.id === botID)
+		return
+
+	let server = bot.guilds.get('619560877405896714')
+	server.channels.get('670806040119607356').send(`**${oldMsg.author} changed:**\`\`\`${oldMsg.content}\`\`\`**to:**\`\`\`${newMsg.content}\`\`\``)
+})
+
 // When user joins Discord server
 bot.on('guildMemberAdd', member => {
 	member.send('Welcome to the SDNE Discord Server!')
