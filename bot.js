@@ -44,9 +44,27 @@ bot.on('messageDelete', msg => {
 	server.channels.get('670103982903132201').send(`**${msg.author}'s message in ${msg.channel} was deleted:** \`\`\`${msg.content}\`\`\``)
 })
 
+bot.on('messageReactionAdd', (reaction, user) => {
+	// console.log(`${user.username} added ${reaction.emoji}`)
+	let mutedData = getUser(user)
+	if (mutedData.muted) {
+		reaction.remove(user)
+		user.send('You are currently Muted, New Messages, Edited Messages & Reactions will all be deleted.\nIf this is a mistake please contact one of the Admins')
+		return
+	}
+})
+
+// Message is edited
 bot.on('messageUpdate', (oldMsg, newMsg) => {
 	if (newMsg.author.id === botID || newMsg.embeds.length > oldMsg.embeds.length)
 		return
+
+	let mutedData = getUser(newMsg.author)
+	if (mutedData.muted) {
+		newMsg.delete()
+		newMsg.author.send('You are currently Muted, New Messages, Edited Messages & Reactions will all be deleted.\nIf this is a mistake please contact one of the Admins')
+		return
+	}
 
 	let server = bot.guilds.get('619560877405896714')
 	server.channels.get('670806040119607356').send(`**${oldMsg.author} changed:**\`\`\`${oldMsg.content}\`\`\`**to:**\`\`\`${newMsg.content}\`\`\``)
@@ -76,6 +94,7 @@ bot.on('message', msg => {
 	let mutedData = getUser(msg.author)
 	if (mutedData.muted) {
 		msg.delete()
+		msg.author.send('You are currently Muted, New Messages, Edited Messages & Reactions will all be deleted.\nIf this is a mistake please contact one of the Admins')
 		return
 	}
 
