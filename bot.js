@@ -193,8 +193,15 @@ bot.on('message', msg => {
 
 			}
 		}
+		
+		let isAdmin = false
+		try {
+			isAdmin = (msg.member.highestRole.id === adminRole ? true : false)
+		} catch (e) {
+			console.error(e)
+		}
 
-		if (msg.member.highestRole.id === adminRole) {
+		if (isAdmin) {
 			// Message is by Admin
 			if (msg.content === '!help') {
 
