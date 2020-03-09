@@ -24,6 +24,7 @@ const assign_year = '619603429379014667'
 const rules_info = '619585833636200449'
 const support = '628315463402913793'
 const deleted = '670103982903132201'
+const edited = '670806040119607356'
 
 //#endregion
 
@@ -37,11 +38,11 @@ bot.on('ready', () => {
 
 // Message is deleted
 bot.on('messageDelete', msg => {
-	if (msg.channel.id === '670103982903132201')
+	if (msg.channel.id === deleted)
 		return
 
 	let server = bot.guilds.get('619560877405896714')
-	server.channels.get('670103982903132201').send(`**${msg.author}'s message in ${msg.channel} was deleted:** \`\`\`${msg.content}\`\`\``)
+	server.channels.get(deleted).send(`**${msg.author.username}'s message in ${msg.channel} was deleted:** \`\`\`${msg.content}\`\`\``)
 })
 
 bot.on('messageReactionAdd', (reaction, user) => {
@@ -67,7 +68,7 @@ bot.on('messageUpdate', (oldMsg, newMsg) => {
 	}
 
 	let server = bot.guilds.get('619560877405896714')
-	server.channels.get('670806040119607356').send(`**${oldMsg.author} changed:**\`\`\`${oldMsg.content}\`\`\`**to:**\`\`\`${newMsg.content}\`\`\``)
+	server.channels.get(edited).send(`**${oldMsg.author.username} changed:**\`\`\`${oldMsg.content}\`\`\`**to:**\`\`\`${newMsg.content}\`\`\``)
 })
 
 // When user joins Discord server
@@ -193,7 +194,7 @@ bot.on('message', msg => {
 
 			}
 		}
-		
+
 		let isAdmin = false
 		try {
 			isAdmin = (msg.member.highestRole.id === adminRole ? true : false)
@@ -536,6 +537,14 @@ bot.on('message', msg => {
 
 			if (msg.content.startsWith('!togglemute ')) {
 				let user = msg.mentions.users.first()
+				if (user === undefined) {
+					msg.reply('missing parameter').then((r) => {
+						setTimeout(() => {
+							r.delete()
+						}, 10000)
+					})
+					return
+				}
 				msg.delete()
 
 				if (user.id === botID) {
