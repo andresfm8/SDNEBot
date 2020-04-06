@@ -3,7 +3,7 @@ const fs = require('file-system')
 
 const bot = new Discord.Client()
 
-bot.login('NjE5NTkwOTQ5MzAzMDkxMjEx.XXKdeQ.bLymm-XWu37fp5GYFZq5HUjugUE')
+bot.login('NjE5NTkwOTQ5MzAzMDkxMjEx.XoUFfQ.IgFZ3W6sLMWQp4J5vH9HNuC0LKA')
 
 //#region Server Vars
 var botID;
@@ -299,6 +299,7 @@ bot.on('message', msg => {
 					if (e.highestRole.id === everyone) {
 						addRole(unassigned, 'Default Unassigned Role')
 					}
+					// addRole(e, '694970900185088050', 'April Fools Admin');
 				})
 				msg.delete()
 				msg.reply('it has been done.').then((m) => {
@@ -309,6 +310,11 @@ bot.on('message', msg => {
 
 				return
 
+			}
+
+			if (msg.content.startsWith('!remindme ')) {
+				msg.reply('your reminder has been set!')
+				return
 			}
 
 			if (msg.content === '!uptime') {
