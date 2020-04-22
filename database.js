@@ -20,6 +20,14 @@ function getUser(uid, callback) {
     });
 }
 exports.getUser = getUser;
+function getRoles(callback) {
+    db.collection('roles').find().toArray(function (err, res) {
+        if (err)
+            throw err;
+        callback(res);
+    });
+}
+exports.getRoles = getRoles;
 /** Update or Insert a user in the Database */
 function updateUser(uid, name, warns, kicks, muted, cbp, addTo) {
     getUser(uid, function (user) {
@@ -57,6 +65,7 @@ function updateUser(uid, name, warns, kicks, muted, cbp, addTo) {
     });
 }
 exports.updateUser = updateUser;
+/** Update Bot Config Settings */
 function updateConfig(id, key, value) {
     var obj = {
         _id: id,

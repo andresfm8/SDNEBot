@@ -1,6 +1,6 @@
 // Imports
 import * as Mongo from "mongodb"
-import { Int32, Timestamp, Db } from "mongodb"
+import { Int32, Long, Timestamp, Db } from "mongodb"
 
 // Instances
 const client = new Mongo.MongoClient("mongodb://localhost:27017/")
@@ -22,9 +22,16 @@ export function getUser(uid: string, callback: Function) {
     })
 }
 
+export function getRoles(callback: Function) {
+    db.collection('roles').find().toArray((err, res: Array<Object>) => {
+        if (err) throw err
+        callback(res)
+    })
+}
+
 /** Update or Insert a user in the Database */
 export function updateUser(uid: string, name: String, warns?: Int32, kicks?: Int32, muted?: boolean, cbp?: Int32, addTo?: boolean | false) {
-    getUser(uid, (user: JSON) => {
+    getUser(uid, (user: Object) => {
         let t: Timestamp = Timestamp.fromNumber(Date.now())
         let userObj = {}
 
@@ -65,6 +72,7 @@ export function updateUser(uid: string, name: String, warns?: Int32, kicks?: Int
     })
 }
 
+/** Update Bot Config Settings */
 export function updateConfig(id: number, key: string, value: string) {
     let obj = {
         _id: id,
