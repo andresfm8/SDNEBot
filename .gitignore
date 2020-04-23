@@ -99,3 +99,6 @@ public
 
 # TypeScript Only
 *.js
+
+# Hide Environment Vars
+env.ts
