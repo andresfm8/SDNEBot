@@ -1,5 +1,6 @@
 import * as Discord from 'discord.js'
 import { Permissions } from 'discord.js'
+import * as db from '../database'
 
 export function help(member: Discord.GuildMember, page: number, channel?: Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel, msg?: Discord.Message): number {
 
@@ -9,28 +10,18 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
             'value': '```!help```'
         },
         {
-            'name': 'Placeholder Tip',
-            'value': '```!placeHold```'
-        },
-        {
-            'name': 'Placeholder Tip',
-            'value': '```!placeHold```'
-        },
-        {
-            'name': 'Placeholder Tip',
-            'value': '```!placeHold```'
-        },
-        {
-            'name': 'Placeholder Tip',
-            'value': '```!placeHold```'
+            'name': 'Pin Message',
+            'value': '```React with 📌 on any message to save it```'
         }
     ]
 
     if (member.hasPermission(Permissions.FLAGS.MANAGE_ROLES))
         tips.push({ 'name': 'Assign Roles Embed', 'value': '```!assignInfo```' })
 
-    if (member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES))
+    if (member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES)) {
         tips.push({ 'name': 'User Info', 'value': '```!info @user```' })
+        tips.push({ 'name': 'Cleanup Messages', 'value': '```!cleanup #```' })
+    }
 
     let maxPages = Math.ceil(tips.length / 3)
 
@@ -58,9 +49,17 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
     })
 
     if (channel !== undefined)
-        channel.send(embed).then(m => { m.react('⬅').then(() => { m.react('➡').then(() => { m.react('💣') })}) })
+        channel.send(embed).then(m => { m.react('⬅️').then(() => { m.react('➡️').then(() => { m.react('🗑️') }) }); db.updateConfig('help', m.id) })
     else if (msg !== undefined)
         msg.edit(embed)
 
     return page
+}
+
+export function hasAttachment(msg: Discord.Message | Discord.PartialMessage): boolean {
+    return (msg.attachments.size > 0)
+}
+
+export function hasURL(msg: Discord.Message | Discord.PartialMessage): boolean {
+    return (msg.content.indexOf('https://') !== -1 || msg.content.indexOf('http://') !== -1)
 }

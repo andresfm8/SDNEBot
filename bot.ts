@@ -5,7 +5,7 @@ import * as db from './database'
 import { botToken } from './env'
 import { roles } from './lib/globVars'
 import { handleReactionAdd } from './lib/handlers/reactions'
-import { handleMessage } from './lib/handlers/messages'
+import { handleMessage, handleMessageDelete, handleMessageEdit } from './lib/handlers/messages'
 
 // Instances
 export const bot = new Discord.Client({ partials: Object.values(Discord.Constants.PartialTypes) })
@@ -25,7 +25,13 @@ bot.on('ready', () => {
 })
 
 // Listen for Messages
-bot.on('message', message => { handleMessage(message) })
+bot.on('message', message => handleMessage(message) )
+
+// Listen for Message Deletions
+bot.on('messageDelete', message => handleMessageDelete(message))
+
+// Listen for Message Edits
+bot.on('messageUpdate', (oldMessage, newMessage) => handleMessageEdit(oldMessage, newMessage))
 
 // Listen for Reactions
 bot.on('messageReactionAdd', (reaction, user) => { handleReactionAdd(reaction, user) })

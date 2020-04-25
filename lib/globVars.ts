@@ -1,6 +1,8 @@
-export var roles: Object = {}
-export var pageNum: number = 0
+import * as Discord from 'discord.js'
 
-export function setPage(num: number) {
-    pageNum = num
+export var roles: Object = {}
+export var helpPage: number = 0
+
+export function setHelpPage(num: number) {
+    helpPage = num
 }
