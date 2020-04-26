@@ -6,6 +6,7 @@ import { botToken } from './env'
 import { roles } from './lib/globVars'
 import { handleReactionAdd } from './lib/handlers/reactions'
 import { handleMessage, handleMessageDelete, handleMessageEdit } from './lib/handlers/messages'
+import { handleNewMember } from './lib/handlers/guildEvents'
 
 // Instances
 export const bot = new Discord.Client({ partials: Object.values(Discord.Constants.PartialTypes) })
@@ -23,6 +24,9 @@ bot.on('ready', () => {
         })
     })
 })
+
+// Listen for Members joining
+bot.on('guildMemberAdd', member => handleNewMember(member))
 
 // Listen for Messages
 bot.on('message', message => handleMessage(message) )

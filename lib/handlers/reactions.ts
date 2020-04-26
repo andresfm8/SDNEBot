@@ -12,7 +12,7 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
     var user = await usr.fetch()
 
     // Disallow actions for Bot
-    if (user === bot.user)
+    if (user.bot)
         return
 
     // Disallow Reacting for Muted Users
@@ -60,8 +60,17 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
                 r.users.remove(user)
         })
 
-        member.roles.remove([roles['📗'], roles['📘'], roles['📙'], roles['🧾']], 'Removed Conflicting Years').then(() => {
+        if (member.roles.cache.array().includes(roles['👻']))
+            var newUser = true
+
+        member.roles.remove([roles['📗'], roles['📘'], roles['📙'], roles['🧾'], roles['👻']], 'Removed Conflicting Years').then(async () => {
             member.roles.add(roles[eName], `Added ${roles[eName].name}`).catch(err => console.error(err))
+
+            if (newUser) {
+                let id = await db.getConfig('generalChannel')
+                let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
+                channel.send(`**Welcome <@${member.user.id}> !**`)
+            }
         }).catch(err => console.error(err))
 
     } else if (campus.includes(eName) && rct.message.id === assignId) {
@@ -85,7 +94,7 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
 
         let author: Discord.User = rct.message.author
 
-        if (author === bot.user || author === user)
+        if (author.bot || author === user)
             return
 
         db.updateUser(author.id, author.username, undefined, undefined, undefined, 1, true)

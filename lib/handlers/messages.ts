@@ -8,7 +8,10 @@ import { setHelpPage } from '../globVars'
 import { help, hasAttachment, hasURL } from '../funcs'
 
 export function handleMessage(msg: Discord.Message) {
-    if (msg.author === bot.user)
+    if (msg.author.bot)
+        return
+
+    if (msg.channel.type === 'dm' || msg.channel.type === 'news')
         return
 
     db.getUser(msg.author.id, (user: Object) => {
@@ -16,6 +19,8 @@ export function handleMessage(msg: Discord.Message) {
         if (user['muted'] === true)
             msg.delete()
     })
+
+    db.updateUser(msg.author.id, msg.author.username, undefined, undefined, undefined, (msg.content.length / 50) | 0, true)
 
     if (msg.author.id !== '140948630919053312')
         return
@@ -30,13 +35,15 @@ export function handleMessage(msg: Discord.Message) {
 
     // For commands that modify Roles
     if (msg.member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)) {
+        let color = 33023
+
         // Displays Role Assignment Embed
         if (m.startsWith('!assigninfo')) {
             let embed = {
                 'embed': {
                     'title': 'Role Assignment Info',
                     'description': 'Click a corresponding reaction to set your year & campus and gain access to the other channels!',
-                    'color': 3553599,
+                    'color': color,
                     'timestamp': new Date(),
                     'fields': [
                         {
@@ -84,6 +91,8 @@ export function handleMessage(msg: Discord.Message) {
 
     // For commands that modify messages or require at least Mod role
     if (msg.member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        let color = 3553599
+
         // Displays Info on user
         if (m.startsWith('!info')) {
             if (msg.mentions.users.first() === undefined) {
@@ -91,60 +100,61 @@ export function handleMessage(msg: Discord.Message) {
                 return
             }
 
-            let mtd = msg.mentions.users.first()
-            let nick = (msg.guild.member(mtd).nickname ? msg.guild.member(mtd).nickname : mtd.username)
+            msg.mentions.users.array().forEach(mtd => {
+                let nick = (msg.guild.member(mtd).nickname ? msg.guild.member(mtd).nickname : mtd.username)
 
-            db.getUser(mtd.id, (user) => {
-                if (user === undefined) {
-                    db.updateUser(mtd.id, mtd.username)
-                    user = {}
-                    user['lastUpdated'] = Timestamp.fromNumber(Date.now())
-                    user['warns'] = 0
-                    user['kicks'] = 0
-                    user['muted'] = false
-                    user['cbp'] = 0
-                }
-
-                let time: Timestamp = user['lastUpdated']
-
-                let embed = {
-                    'embed': {
-                        'title': `${nick}'s Information`,
-                        'description': `Get a user's information`,
-                        'color': 3553599,
-                        'timestamp': new Date(time.toNumber()),
-                        'footer': {
-                            'text': 'Last Updated'
-                        },
-                        'fields': [
-                            {
-                                'name': 'Warns',
-                                'value': `\`\`\`${user['warns']}\`\`\``,
-                                'inline': true
-                            },
-                            {
-                                'name': 'Kicks',
-                                'value': `\`\`\`${user['kicks']}\`\`\``,
-                                'inline': true
-                            },
-                            {
-                                'name': 'Muted',
-                                'value': `\`\`\`${user['muted']}\`\`\``,
-                                'inline': true
-                            },
-                            {
-                                'name': 'Contribution Points',
-                                'value': `\`\`\`${user['cbp']}\`\`\``,
-                                'inline': true
-                            }
-                        ]
+                db.getUser(mtd.id, (user) => {
+                    if (user === undefined) {
+                        db.updateUser(mtd.id, mtd.username)
+                        user = {}
+                        user['lastUpdated'] = Timestamp.fromNumber(Date.now())
+                        user['warns'] = 0
+                        user['kicks'] = 0
+                        user['muted'] = false
+                        user['cbp'] = 0
                     }
-                }
 
-                if (mtd.avatarURL() !== null)
-                    embed['embed']['thumbnail'] = { 'url': mtd.avatarURL({ dynamic: true, size: 4096 }) }
+                    let time: Timestamp = user['lastUpdated']
 
-                msg.channel.send(embed)
+                    let embed = {
+                        'embed': {
+                            'title': `${nick}'s Information`,
+                            'description': `Get a user's information`,
+                            'color': color,
+                            'timestamp': new Date(time.toNumber()),
+                            'footer': {
+                                'text': 'Last Updated'
+                            },
+                            'fields': [
+                                {
+                                    'name': 'Warns',
+                                    'value': `\`\`\`${user['warns']}\`\`\``,
+                                    'inline': true
+                                },
+                                {
+                                    'name': 'Kicks',
+                                    'value': `\`\`\`${user['kicks']}\`\`\``,
+                                    'inline': true
+                                },
+                                {
+                                    'name': 'Muted',
+                                    'value': `\`\`\`${user['muted']}\`\`\``,
+                                    'inline': true
+                                },
+                                {
+                                    'name': 'Contribution Points',
+                                    'value': `\`\`\`${user['cbp']}\`\`\``,
+                                    'inline': true
+                                }
+                            ]
+                        }
+                    }
+
+                    if (mtd.avatarURL() !== null)
+                        embed['embed']['thumbnail'] = { 'url': mtd.avatarURL({ dynamic: true, size: 4096 }) }
+
+                    msg.channel.send(embed)
+                })
             })
 
             return
@@ -193,12 +203,155 @@ export function handleMessage(msg: Discord.Message) {
         }
     }
 
+    // For commands that inhibit user's speaking privs and/or could result in an auto kick
+    if (msg.member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) {
+        let color = 16725558
+
+        // Mute User(s)
+        if (m.startsWith('!mute')) {
+            if (msg.mentions.users.first() === undefined) {
+                msg.react('❓')
+                return
+            }
+
+            let mutedUsers: string = ''
+
+            msg.mentions.users.array().forEach(user => {
+                if (msg.guild.member(user).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
+                    return
+
+                db.updateUser(user.id, user.username, undefined, undefined, true)
+
+                let nick: string = (msg.guild.member(user).nickname ? msg.guild.member(user).nickname : user.username)
+
+                if (mutedUsers === '')
+                    mutedUsers += nick
+                else
+                    mutedUsers += `, ${nick}`
+            })
+
+            let embed = {
+                'embed': {
+                    'title': `🔈 Mute Users`,
+                    'color': color,
+                    'timestamp': new Date(),
+                    'fields': [
+                        {
+                            'name': 'Successfully Muted:',
+                            'value': `\`\`\`${mutedUsers}\`\`\``,
+                        }
+                    ]
+                }
+            }
+
+            if (mutedUsers !== '')
+                msg.channel.send(embed)
+            else
+                msg.react('❓')
+
+            return
+        }
+
+        // Unmute User(s)
+        if (m.startsWith('!unmute')) {
+            if (msg.mentions.users.first() === undefined) {
+                msg.react('❓')
+                return
+            }
+
+            let unmutedUsers: string = ''
+
+            msg.mentions.users.array().forEach(user => {
+                if (msg.guild.member(user).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
+                    return
+
+                db.updateUser(user.id, user.username, undefined, undefined, false)
+
+                let nick: string = (msg.guild.member(user).nickname ? msg.guild.member(user).nickname : user.username)
+
+                if (unmutedUsers === '')
+                    unmutedUsers += nick
+                else
+                    unmutedUsers += `, ${nick}`
+            })
+
+            let embed = {
+                'embed': {
+                    'title': `🔊 Unmute Users`,
+                    'color': color,
+                    'timestamp': new Date(),
+                    'fields': [
+                        {
+                            'name': 'Successfully Unmuted:',
+                            'value': `\`\`\`${unmutedUsers}\`\`\``,
+                        }
+                    ]
+                }
+            }
+
+            if (unmutedUsers !== '')
+                msg.channel.send(embed)
+            else
+                msg.react('❓')
+
+            return
+        }
+
+        // Warn User(s)
+        if (m.startsWith('!warn')) {
+            if (msg.mentions.users.first() === undefined) {
+                msg.react('❓')
+                return
+            }
+
+            let ruleNum = Number.parseInt(msg.content.split(' ', 3)[1])
+
+            if (ruleNum === NaN) {
+                msg.react('❓')
+                return
+            }
+
+            let warned: string = ''
+
+            msg.mentions.users.array().forEach(user => {
+                if (msg.guild.member(user).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
+                    return
+
+                db.updateUser(user.id, user.username, 1, undefined, undefined, undefined, true)
+
+                if (warned === '')
+                    warned += `<@${user.id}>`
+                else
+                    warned += `, <@${user.id}>`
+            })
+
+            let embed = {
+                'embed': {
+                    'title': `🔊 Unmute Users`,
+                    'color': color,
+                    'timestamp': new Date(),
+                    'fields': [
+                        {
+                            'name': 'Successfully Unmuted:',
+                            'value': `\`\`\`${warned}\`\`\``,
+                        }
+                    ]
+                }
+            }
+
+            if (warned !== '')
+                msg.channel.send(embed)
+            else
+                msg.react('❓')
+
+            return
+        }
+    }
+
     if (m.startsWith('!')) {
         msg.react('❓')
         return
     }
-
-    db.updateUser(msg.author.id, msg.author.username, undefined, undefined, undefined, (msg.content.length / 50) | 0, true)
 
     if (hasAttachment(msg) || hasURL(msg))
         msg.react('👍').then(() => msg.react('👎').then(() => { msg.react('📌') }))
@@ -207,7 +360,7 @@ export function handleMessage(msg: Discord.Message) {
 export async function handleMessageDelete(msg: Discord.Message | Discord.PartialMessage) {
     if (msg.partial) await msg.fetch()
 
-    if (msg.author === bot.user)
+    if (msg.author.bot)
         return
 
     let id = await db.getConfig('deletedChannel')
@@ -217,35 +370,32 @@ export async function handleMessageDelete(msg: Discord.Message | Discord.Partial
         return
 
     let nick = (msg.member.nickname ? msg.member.nickname : msg.author.username)
-    let ch = <Discord.TextChannel>msg.channel
 
-    let embed = {
-        'embed': {
-            'title': `Message Deleted`,
-            'description': `by ${nick} in ${ch.name}`,
-            'color': 3553599,
-            'timestamp': new Date(),
-            'fields': []
-        }
-    }
+    let content = msg.content.replace(/`/g, '')
 
-    if (msg.author.avatarURL() !== null)
-        embed['embed']['thumbnail'] = { 'url': msg.author.avatarURL({ dynamic: true, size: 4096 }) }
-
-    if (msg.content !== '' && msg.content !== undefined)
-        embed['embed']['fields'].push({ 'name': 'Message', 'value': `\`\`\`${msg.content}\`\`\`` })
-
-    if (hasAttachment(msg))
-        embed['embed']['fields'].push({ 'name': 'Attachments', 'value': `\`\`\`${msg.attachments.size}\`\`\`` })
-
-    channel.send(embed)
-
+    channel.send(`**${nick}'s message in <#${msg.channel.id}> was deleted:**\`\`\`${content}\`\`\``)
 }
 
 export async function handleMessageEdit(oldMsg: Discord.Message | Discord.PartialMessage, newMsg: Discord.Message | Discord.PartialMessage) {
     if (oldMsg.partial) await oldMsg.fetch()
     if (newMsg.partial) await newMsg.fetch()
 
-    if (oldMsg.author === bot.user)
+    if (oldMsg.author.bot)
         return
+
+    db.getUser(oldMsg.author.id, (user: Object) => {
+        if (user === undefined) return
+        if (user['muted'] === true)
+            newMsg.delete()
+    })
+
+    let id = await db.getConfig('editedChannel')
+    let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
+
+    let nick = (oldMsg.member.nickname ? oldMsg.member.nickname : oldMsg.author.username)
+
+    let oldContent = oldMsg.content.replace(/`/g, '')
+    let newContent = newMsg.content.replace(/`/g, '')
+
+    channel.send(`**${nick} changed their message in <#${oldMsg.channel.id}> from:**\`\`\`${oldContent}\`\`\`**to:**\`\`\`${newContent}\`\`\``)
 }

@@ -3,7 +3,7 @@ import * as Mongo from "mongodb"
 import { Int32, Long, Timestamp, Db } from "mongodb"
 
 // Instances
-const client = new Mongo.MongoClient("mongodb://localhost:27017/")
+const client = new Mongo.MongoClient("mongodb://localhost:27017/", { useUnifiedTopology: true })
 
 var db: Db
 
