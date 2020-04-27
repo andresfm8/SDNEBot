@@ -18,7 +18,21 @@ export function getUser(uid: string, callback: Function) {
     db.collection('users').find({ uid: uid }).toArray((err, res) => {
         if (err) throw err
 
-        callback(res[0])
+        if (res[0] !== undefined)
+            callback(res[0])
+        else {
+            let userData = {}
+            userData['uid'] = uid
+            userData['lastUpdated'] = Timestamp.fromNumber(Date.now())
+            userData['warns'] = 0
+            userData['kicks'] = 0
+            userData['muted'] = false
+            userData['cbp'] = 0
+            db.collection('users').insertOne(userData, (err, res) => {
+                if (err) throw err
+            })
+            callback(userData)
+        }
     })
 }
 

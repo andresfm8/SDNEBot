@@ -19,13 +19,14 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
         tips.push({ 'name': 'Assign Roles Embed', 'value': '```!assignInfo```' })
 
     if (member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        tips.push({ 'name': 'User(s\') Info', 'value': '```!info @user```' })
-        tips.push({ 'name': 'Cleanup Messages', 'value': '```!cleanup #```' })
+        tips.push({ 'name': 'User(s\') Info', 'value': '```!info @user[]```' })
+        tips.push({ 'name': 'Cleanup Messages', 'value': '```!cleanup #num_messages```' })
     }
 
     if (member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) {
-        tips.push({ 'name': 'Mute User(s)', 'value': '```!mute @non_admin_user```' })
-        tips.push({ 'name': 'Unmute User(s)', 'value': '```!unmute @non_admin_user```' })
+        tips.push({ 'name': 'Mute User(s)', 'value': '```!mute @non_admin_user[]```' })
+        tips.push({ 'name': 'Unmute User(s)', 'value': '```!unmute @non_admin_user[]```' })
+        tips.push({ 'name': 'Warn User(s)', 'value': '```!warn #rule_num @non_admin_user[]```' })
     }
 
     let maxPages = Math.ceil(tips.length / 3)
