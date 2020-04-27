@@ -15,21 +15,44 @@ export function handleMessage(msg: Discord.Message) {
         return
 
     db.getUser(msg.author.id, (user: Object) => {
-        if (user === undefined) return
         if (user['muted'] === true)
             msg.delete()
     })
 
     db.updateUser(msg.author.id, msg.author.username, undefined, undefined, undefined, (msg.content.length / 50) | 0, true)
 
-    if (msg.author.id !== '140948630919053312')
-        return
-
     var m: string = msg.content.toLowerCase().trim()
 
     // View Help Menu
     if (m.startsWith('!help')) {
         setHelpPage(help(msg.member, 0, msg.channel))
+        return
+    }
+
+    // View Rules
+    if (m.startsWith('!rules')) {
+        let dm = false
+
+        rules.forEach(rule => {
+            let embed = {
+                'embed': {
+                    'title': `${rule.title}`,
+                    'description': `${rule.rule}`,
+                    'color': 3553599
+                }
+            }
+
+            if (msg.member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES))
+                msg.channel.send(embed).then(() => msg.delete())
+            else {
+                msg.member.send(embed)
+                dm = true
+            }
+        })
+
+        if (dm)
+            msg.reply('check your DMs!')
+
         return
     }
 
@@ -100,21 +123,11 @@ export function handleMessage(msg: Discord.Message) {
                 return
             }
 
-            msg.mentions.users.array().forEach(mtd => {
-                let nick = (msg.guild.member(mtd).nickname ? msg.guild.member(mtd).nickname : mtd.username)
+            msg.mentions.users.array().forEach(mention => {
+                let nick = (msg.guild.member(mention).nickname ? msg.guild.member(mention).nickname : mention.username)
 
-                db.getUser(mtd.id, (user) => {
-                    if (user === undefined) {
-                        db.updateUser(mtd.id, mtd.username)
-                        user = {}
-                        user['lastUpdated'] = Timestamp.fromNumber(Date.now())
-                        user['warns'] = 0
-                        user['kicks'] = 0
-                        user['muted'] = false
-                        user['cbp'] = 0
-                    }
-
-                    let time: Timestamp = user['lastUpdated']
+                db.getUser(mention.id, (userData: Object) => {
+                    let time: Timestamp = userData['lastUpdated']
 
                     let embed = {
                         'embed': {
@@ -128,30 +141,30 @@ export function handleMessage(msg: Discord.Message) {
                             'fields': [
                                 {
                                     'name': 'Warns',
-                                    'value': `\`\`\`${user['warns']}\`\`\``,
+                                    'value': `\`\`\`${userData['warns']}\`\`\``,
                                     'inline': true
                                 },
                                 {
                                     'name': 'Kicks',
-                                    'value': `\`\`\`${user['kicks']}\`\`\``,
+                                    'value': `\`\`\`${userData['kicks']}\`\`\``,
                                     'inline': true
                                 },
                                 {
                                     'name': 'Muted',
-                                    'value': `\`\`\`${user['muted']}\`\`\``,
+                                    'value': `\`\`\`${userData['muted']}\`\`\``,
                                     'inline': true
                                 },
                                 {
                                     'name': 'Contribution Points',
-                                    'value': `\`\`\`${user['cbp']}\`\`\``,
+                                    'value': `\`\`\`${userData['cbp']}\`\`\``,
                                     'inline': true
                                 }
                             ]
                         }
                     }
 
-                    if (mtd.avatarURL() !== null)
-                        embed['embed']['thumbnail'] = { 'url': mtd.avatarURL({ dynamic: true, size: 4096 }) }
+                    if (mention.avatarURL() !== null)
+                        embed['embed']['thumbnail'] = { 'url': mention.avatarURL({ dynamic: true, size: 4096 }) }
 
                     msg.channel.send(embed)
                 })
@@ -253,7 +266,6 @@ export function handleMessage(msg: Discord.Message) {
         }
 
         // Unmute User(s)
-
         if (m.startsWith('!unmute')) {
             if (msg.mentions.users.first() === undefined) {
                 msg.react('❓')
@@ -262,18 +274,18 @@ export function handleMessage(msg: Discord.Message) {
 
             let unmutedUsers: string = ''
 
-            msg.mentions.users.array().forEach(user => {
-                if (msg.guild.member(user).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
+            msg.mentions.users.array().forEach(mention => {
+                if (msg.guild.member(mention).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
                     return
 
-                db.updateUser(user.id, user.username, undefined, undefined, false)
+                db.updateUser(mention.id, mention.username, undefined, undefined, false)
 
-                let nick: string = (msg.guild.member(user).nickname ? msg.guild.member(user).nickname : user.username)
+                let nick: string = (msg.guild.member(mention).nickname ? msg.guild.member(mention).nickname : mention.username)
 
-                if (unmutedUsers === '')
-                    unmutedUsers += nick
-                else
-                    unmutedUsers += `, ${nick}`
+                if (unmutedUsers !== '')
+                    unmutedUsers += ', '
+
+                unmutedUsers += nick
             })
 
             let embed = {
@@ -312,46 +324,10 @@ export function handleMessage(msg: Discord.Message) {
                 return
             }
 
-            let warned: string = ''
-            let actions: string = ''
+            var warned: string = ''
+            var actions: string = ''
 
-            msg.mentions.users.array().forEach(mtd => {
-                if (msg.guild.member(mtd).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
-                    return
-
-                db.updateUser(mtd.id, mtd.username, 1, undefined, undefined, undefined, true)
-
-                db.getUser(mtd.id, (user: Object) => {
-                    if (user === undefined) {
-                        db.updateUser(mtd.id, mtd.username)
-                        user = {}
-                        user['lastUpdated'] = Timestamp.fromNumber(Date.now())
-                        user['warns'] = 0
-                        user['kicks'] = 0
-                        user['muted'] = false
-                        user['cbp'] = 0
-                    }
-                    
-                    if (user['warns'] % 4 === 0) {
-                        db.updateUser(mtd.id, mtd.username, undefined, 1, undefined, undefined, true)
-                        let days = user['warns'] / 4
-                        msg.guild.member(mtd).ban({ days: days, reason: `${mtd.username} banned for ${days} day(s) because they have ${user['warns']} warnings.` })
-                        let nick = (msg.guild.member(mtd).nickname ? msg.guild.member(mtd).nickname : mtd.username)
-
-                        if (actions === '')
-                            actions += `${nick} kicked for ${days} day(s)`
-                        else
-                            actions += `\n${nick} kicked for ${days} day(s)`
-                    }
-                })
-
-                if (warned === '')
-                    warned += `<@${mtd.id}>`
-                else
-                    warned += `, <@${mtd.id}>`
-            })
-
-            let embed = {
+            var embed = {
                 'embed': {
                     'title': `🚩 Rule Violation`,
                     'description': 'You violated:',
@@ -359,19 +335,51 @@ export function handleMessage(msg: Discord.Message) {
                     'timestamp': new Date(),
                     'fields': [
                         {
-                            'name': `**${rules[ruleNum + 1].title}**`,
-                            'value': `${rules[ruleNum + 1].rule}`,
+                            'name': `**${rules[ruleNum - 1].title}**`,
+                            'value': `${rules[ruleNum - 1].rule}`,
                         }
                     ]
                 }
             }
 
+            msg.mentions.users.array().forEach(mention => {
+                if (msg.guild.member(mention).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
+                    return
+
+                db.getUser(mention.id, (userData: Object) => {
+                    db.updateUser(mention.id, mention.username, 1, undefined, undefined, undefined, true)
+
+                    userData['warns'] += 1
+
+                    if (userData['warns'] % 3 === 0 && userData['warns'] !== 0) {
+                        db.updateUser(mention.id, mention.username, undefined, 1, undefined, undefined, true)
+                        let days = userData['warns'] / 3
+
+                        let nick = (msg.guild.member(mention).nickname ? msg.guild.member(mention).nickname : mention.username)
+
+                        if (actions !== '')
+                            actions += '\n'
+
+                        actions += `${nick} kicked for ${days} day(s)`
+
+                        msg.guild.member(mention).send(`**You have been banned for ${days} day(s)**`, embed).then(() => {
+                            msg.guild.member(mention).ban({ days: days, reason: `${mention.username} banned for ${days} day(s) because they have ${userData['warns']} warnings.` })
+                        })
+                    }
+                })
+
+                if (warned !== '')
+                    warned += ', '
+
+                warned += `<@${mention.id}>`
+            })
+
             if (actions !== '')
                 embed['embed']['fields'].push({ 'name': '**Actions Taken:**', 'value': actions })
 
-            if (warned !== '')
-                msg.channel.send(warned, embed)
-            else
+            if (warned !== '') {
+                msg.channel.send(warned, embed).then(() => msg.delete())
+            } else
                 msg.react('❓')
 
             return
@@ -414,7 +422,6 @@ export async function handleMessageEdit(oldMsg: Discord.Message | Discord.Partia
         return
 
     db.getUser(oldMsg.author.id, (user: Object) => {
-        if (user === undefined) return
         if (user['muted'] === true)
             newMsg.delete()
     })
