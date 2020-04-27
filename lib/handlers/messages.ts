@@ -4,7 +4,7 @@ import * as db from '../../database'
 import { Timestamp } from 'mongodb'
 import { Permissions } from 'discord.js'
 import { bot } from '../../bot'
-import { setHelpPage } from '../globVars'
+import { setHelpPage, rules } from '../globVars'
 import { help, hasAttachment, hasURL } from '../funcs'
 
 export function handleMessage(msg: Discord.Message) {
@@ -253,6 +253,7 @@ export function handleMessage(msg: Discord.Message) {
         }
 
         // Unmute User(s)
+
         if (m.startsWith('!unmute')) {
             if (msg.mentions.users.first() === undefined) {
                 msg.react('❓')
@@ -306,18 +307,33 @@ export function handleMessage(msg: Discord.Message) {
 
             let ruleNum = Number.parseInt(msg.content.split(' ', 3)[1])
 
-            if (ruleNum === NaN) {
+            if (ruleNum === NaN || ruleNum > rules.length || ruleNum < 1) {
                 msg.react('❓')
                 return
             }
 
             let warned: string = ''
+            let actions: string = ''
 
             msg.mentions.users.array().forEach(user => {
                 if (msg.guild.member(user).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
                     return
 
                 db.updateUser(user.id, user.username, 1, undefined, undefined, undefined, true)
+
+                db.getUser(user.id, (userData: Object) => {
+                    if (userData['warns'] % 4 === 0) {
+                        db.updateUser(user.id, user.username, undefined, 1, undefined, undefined, true)
+                        let days = userData['warns'] / 4
+                        msg.guild.member(user).ban({ days: days, reason: `${user.username} banned for ${days} day(s) because they have ${userData['warns']} warnings.` })
+                        let nick = (msg.guild.member(user).nickname ? msg.guild.member(user).nickname : user.username)
+
+                        if (actions === '')
+                            actions += `${nick} kicked for ${days} day(s)`
+                        else
+                            actions += `\n${nick} kicked for ${days} day(s)`
+                    }
+                })
 
                 if (warned === '')
                     warned += `<@${user.id}>`
@@ -327,20 +343,24 @@ export function handleMessage(msg: Discord.Message) {
 
             let embed = {
                 'embed': {
-                    'title': `🔊 Unmute Users`,
+                    'title': `🚩 Rule Violation`,
+                    'description': 'You violated:',
                     'color': color,
                     'timestamp': new Date(),
                     'fields': [
                         {
-                            'name': 'Successfully Unmuted:',
-                            'value': `\`\`\`${warned}\`\`\``,
+                            'name': `**${rules[ruleNum + 1].title}**`,
+                            'value': `${rules[ruleNum + 1].rule}`,
                         }
                     ]
                 }
             }
 
+            if (actions !== '')
+                embed['embed']['fields'].push({ 'name': '**Actions Taken:**', 'value': actions })
+
             if (warned !== '')
-                msg.channel.send(embed)
+                msg.channel.send(warned, embed)
             else
                 msg.react('❓')
 
