@@ -15,12 +15,12 @@ export async function handleNewMember(member: Discord.GuildMember | Discord.Part
 
     let admins: string = ''
 
-    members.array().forEach(m => {
-        if (m.hasPermission(Permissions.FLAGS.ADMINISTRATOR) && !m.user.bot) {
+    members.array().forEach(member => {
+        if (member.hasPermission(Permissions.FLAGS.ADMINISTRATOR) && !member.user.bot) {
             if (admins === '')
-                admins += `<@${m.id}>`
+                admins += `<@${member.id}>`
             else
-                admins += `, <@${m.id}>`
+                admins += `, <@${member.id}>`
         }
     })
 
