@@ -1,9 +1,10 @@
 // Imports
 import * as Mongo from "mongodb"
 import { Int32, Long, Timestamp, Db } from "mongodb"
+import { dbPass } from "./env"
 
 // Instances
-const client = new Mongo.MongoClient("mongodb://localhost:27017/", { useUnifiedTopology: true })
+const client = new Mongo.MongoClient(`mongodb://dbUser:${dbPass}@sdnebot-shard-00-00-sh7xu.gcp.mongodb.net:27017,sdnebot-shard-00-01-sh7xu.gcp.mongodb.net:27017,sdnebot-shard-00-02-sh7xu.gcp.mongodb.net:27017/test?ssl=true&replicaSet=SDNEBot-shard-0&authSource=admin&retryWrites=true&w=majority`, { useUnifiedTopology: true, useNewUrlParser: true })
 
 var db: Db
 
