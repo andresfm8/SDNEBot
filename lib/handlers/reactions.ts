@@ -16,9 +16,8 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
         return
 
     // Disallow Reacting for Muted Users
-    db.getUser(user.id, (usr: Object) => {
-        if (usr === undefined) return
-        if (usr['muted'] === true)
+    db.getUser(user.id, (userData: Object) => {
+        if (userData['muted'] === true)
             rct.users.remove(user)
     })
 
