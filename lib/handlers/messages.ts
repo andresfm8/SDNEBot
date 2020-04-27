@@ -315,18 +315,28 @@ export function handleMessage(msg: Discord.Message) {
             let warned: string = ''
             let actions: string = ''
 
-            msg.mentions.users.array().forEach(user => {
-                if (msg.guild.member(user).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
+            msg.mentions.users.array().forEach(mtd => {
+                if (msg.guild.member(mtd).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
                     return
 
-                db.updateUser(user.id, user.username, 1, undefined, undefined, undefined, true)
+                db.updateUser(mtd.id, mtd.username, 1, undefined, undefined, undefined, true)
 
-                db.getUser(user.id, (userData: Object) => {
-                    if (userData['warns'] % 4 === 0) {
-                        db.updateUser(user.id, user.username, undefined, 1, undefined, undefined, true)
-                        let days = userData['warns'] / 4
-                        msg.guild.member(user).ban({ days: days, reason: `${user.username} banned for ${days} day(s) because they have ${userData['warns']} warnings.` })
-                        let nick = (msg.guild.member(user).nickname ? msg.guild.member(user).nickname : user.username)
+                db.getUser(mtd.id, (user: Object) => {
+                    if (user === undefined) {
+                        db.updateUser(mtd.id, mtd.username)
+                        user = {}
+                        user['lastUpdated'] = Timestamp.fromNumber(Date.now())
+                        user['warns'] = 0
+                        user['kicks'] = 0
+                        user['muted'] = false
+                        user['cbp'] = 0
+                    }
+                    
+                    if (user['warns'] % 4 === 0) {
+                        db.updateUser(mtd.id, mtd.username, undefined, 1, undefined, undefined, true)
+                        let days = user['warns'] / 4
+                        msg.guild.member(mtd).ban({ days: days, reason: `${mtd.username} banned for ${days} day(s) because they have ${user['warns']} warnings.` })
+                        let nick = (msg.guild.member(mtd).nickname ? msg.guild.member(mtd).nickname : mtd.username)
 
                         if (actions === '')
                             actions += `${nick} kicked for ${days} day(s)`
@@ -336,9 +346,9 @@ export function handleMessage(msg: Discord.Message) {
                 })
 
                 if (warned === '')
-                    warned += `<@${user.id}>`
+                    warned += `<@${mtd.id}>`
                 else
-                    warned += `, <@${user.id}>`
+                    warned += `, <@${mtd.id}>`
             })
 
             let embed = {
