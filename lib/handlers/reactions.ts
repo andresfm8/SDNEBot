@@ -2,7 +2,7 @@ import * as Discord from 'discord.js'
 
 import * as db from '../../database'
 import { bot } from '../../bot'
-import { help } from '../funcs'
+import { help, hasAttachment } from '../funcs'
 import { helpPage, setHelpPage, roles } from '../globVars'
 
 export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Discord.User | Discord.PartialUser) {
@@ -87,8 +87,12 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
     } else if (eName === '👎') {
         // Do Nothing
     } else if (eName === '📌') {
-        let nick = (rct.message.member.nickname ? rct.message.member.nickname : rct.message.author.username)
-        user.send(`**${nick} sent:** ${rct.message.content}`, (rct.message.embeds || rct.message.attachments.array())).then(dm => dm.react('🗑️'))
+        if (hasAttachment(rct.message))
+            user.send(`**<@${rct.message.author.id}> sent:**\n${rct.message.content}`, rct.message.attachments.array()).then(dm => dm.react('🗑️'))
+        else if (rct.message.embeds.length > 0)
+            user.send(`**<@${rct.message.author.id}> sent:**\n${rct.message.content}`, rct.message.embeds).then(dm => dm.react('🗑️'))
+        else
+            user.send(`**<@${rct.message.author.id}> sent:**\n${rct.message.content}`).then(dm => dm.react('🗑️'))
     } else {
 
         let author: Discord.User = rct.message.author
