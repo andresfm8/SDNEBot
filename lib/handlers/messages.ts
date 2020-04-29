@@ -8,7 +8,7 @@ import { setHelpPage, rules } from '../globVars'
 import { help, hasAttachment, hasURL } from '../funcs'
 
 export function handleMessage(msg: Discord.Message) {
-    if (msg.author.bot)
+    if (msg.author.bot || msg.system)
         return
 
     if (msg.channel.type === 'dm' || msg.channel.type === 'news')
@@ -325,7 +325,6 @@ export function handleMessage(msg: Discord.Message) {
             }
 
             var warned: string = ''
-            var actions: string = ''
 
             var embed = {
                 'embed': {
@@ -353,18 +352,17 @@ export function handleMessage(msg: Discord.Message) {
 
                     if (userData['warns'] % 3 === 0 && userData['warns'] !== 0) {
                         db.updateUser(mention.id, mention.username, undefined, 1, undefined, undefined, true)
-                        let days = userData['warns'] / 3
+                        userData['kicks'] += 1
 
-                        let nick = (msg.guild.member(mention).nickname ? msg.guild.member(mention).nickname : mention.username)
-
-                        if (actions !== '')
-                            actions += '\n'
-
-                        actions += `${nick} kicked for ${days} day(s)`
-
-                        msg.guild.member(mention).send(`**You have been banned for ${days} day(s)**`, embed).then(() => {
-                            msg.guild.member(mention).ban({ days: days, reason: `${mention.username} banned for ${days} day(s) because they have ${userData['warns']} warnings.` })
-                        })
+                        if (userData['kicks'] % 3 === 0 && userData['kicks'] !== 0) {
+                            msg.guild.member(mention).send(`**You have been banned for violating the rules:**`, embed).then(() => {
+                                msg.guild.member(mention).ban({ reason: `${mention.username} banned because they have ${userData['kicks']} kicks.` })
+                            })
+                        } else {
+                            msg.guild.member(mention).send(`**You have been kicked for violating the rules:**`, embed).then(() => {
+                                msg.guild.member(mention).kick(`${mention.username} kicked because they have ${userData['warns']} warnings.`)
+                            })
+                        }
                     }
                 })
 
@@ -374,12 +372,9 @@ export function handleMessage(msg: Discord.Message) {
                 warned += `<@${mention.id}>`
             })
 
-            if (actions !== '')
-                embed['embed']['fields'].push({ 'name': '**Actions Taken:**', 'value': actions })
-
-            if (warned !== '') {
+            if (warned !== '')
                 msg.channel.send(warned, embed).then(() => msg.delete())
-            } else
+            else
                 msg.react('❓')
 
             return
@@ -398,7 +393,7 @@ export function handleMessage(msg: Discord.Message) {
 export async function handleMessageDelete(msg: Discord.Message | Discord.PartialMessage) {
     if (msg.partial) await msg.fetch()
 
-    if (msg.author.bot)
+    if (msg.author.bot || msg.system)
         return
 
     let id = await db.getConfig('deletedChannel')

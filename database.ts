@@ -60,7 +60,7 @@ export async function getConfig(key: string): Promise<string> {
 }
 
 /** Update or Insert a user in the Database */
-export function updateUser(uid: string, name: String, warns?: Int32, kicks?: Int32, muted?: boolean, cbp?: Int32, addTo?: boolean | false) {
+export function updateUser(uid: string, name: string, warns?: Int32, kicks?: Int32, muted?: boolean, cbp?: Int32, addTo?: boolean | false) {
     getUser(uid, (user: Object) => {
         let t: Timestamp = Timestamp.fromNumber(Date.now())
         let userObj = {}
