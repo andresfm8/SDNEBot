@@ -15,7 +15,7 @@ client.connect((err, dbc) => {
 })
 
 /** Returns user from Database */
-export function getUser(uid: string, callback: Function) {
+export function getUser(uid: string, name: string, callback: Function) {
     db.collection('users').find({ uid: uid }).toArray((err, res) => {
         if (err) throw err
 
@@ -24,6 +24,7 @@ export function getUser(uid: string, callback: Function) {
         else {
             let userData = {}
             userData['uid'] = uid
+            userData['name'] = name
             userData['lastUpdated'] = Timestamp.fromNumber(Date.now())
             userData['warns'] = 0
             userData['kicks'] = 0
@@ -61,7 +62,7 @@ export async function getConfig(key: string): Promise<string> {
 
 /** Update or Insert a user in the Database */
 export function updateUser(uid: string, name: string, warns?: Int32, kicks?: Int32, muted?: boolean, cbp?: Int32, addTo?: boolean | false) {
-    getUser(uid, (user: Object) => {
+    getUser(uid, name, (user: Object) => {
         let t: Timestamp = Timestamp.fromNumber(Date.now())
         let userObj = {}
 

@@ -14,7 +14,7 @@ export function handleMessage(msg: Discord.Message) {
     if (msg.channel.type === 'dm' || msg.channel.type === 'news')
         return
 
-    db.getUser(msg.author.id, (user: Object) => {
+    db.getUser(msg.author.id, msg.author.username, (user: Object) => {
         if (user['muted'] === true)
             msg.delete()
     })
@@ -126,7 +126,7 @@ export function handleMessage(msg: Discord.Message) {
             msg.mentions.users.array().forEach(mention => {
                 let nick = (msg.guild.member(mention).nickname ? msg.guild.member(mention).nickname : mention.username)
 
-                db.getUser(mention.id, (userData: Object) => {
+                db.getUser(mention.id, mention.username, (userData: Object) => {
                     let time: Timestamp = userData['lastUpdated']
 
                     let embed = {
@@ -345,7 +345,7 @@ export function handleMessage(msg: Discord.Message) {
                 if (msg.guild.member(mention).hasPermission(Permissions.FLAGS.KICK_MEMBERS))
                     return
 
-                db.getUser(mention.id, (userData: Object) => {
+                db.getUser(mention.id, mention.username, (userData: Object) => {
                     db.updateUser(mention.id, mention.username, 1, undefined, undefined, undefined, true)
 
                     userData['warns'] += 1
@@ -416,7 +416,7 @@ export async function handleMessageEdit(oldMsg: Discord.Message | Discord.Partia
     if (oldMsg.author.bot)
         return
 
-    db.getUser(oldMsg.author.id, (user: Object) => {
+    db.getUser(oldMsg.author.id, oldMsg.author.username, (user: Object) => {
         if (user['muted'] === true)
             newMsg.delete()
     })
