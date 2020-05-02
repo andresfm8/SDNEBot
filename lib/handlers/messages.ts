@@ -8,10 +8,7 @@ import { setHelpPage, rules } from '../globVars'
 import { help, hasAttachment, hasURL } from '../funcs'
 
 export function handleMessage(msg: Discord.Message) {
-    if (msg.author.bot || msg.system)
-        return
-
-    if (msg.channel.type === 'dm' || msg.channel.type === 'news')
+    if (msg.author.bot || msg.system || msg.channel.type === 'dm')
         return
 
     db.getUser(msg.author.id, msg.author.username, (user: Object) => {
@@ -393,7 +390,7 @@ export function handleMessage(msg: Discord.Message) {
 export async function handleMessageDelete(msg: Discord.Message | Discord.PartialMessage) {
     if (msg.partial) await msg.fetch()
 
-    if (msg.author.bot || msg.system)
+    if (msg.author.bot || msg.system || msg.channel.type === 'dm')
         return
 
     let id = await db.getConfig('deletedChannel')
@@ -413,7 +410,7 @@ export async function handleMessageEdit(oldMsg: Discord.Message | Discord.Partia
     if (oldMsg.partial) await oldMsg.fetch()
     if (newMsg.partial) await newMsg.fetch()
 
-    if (oldMsg.author.bot)
+    if (oldMsg.author.bot || oldMsg.channel.type === 'dm')
         return
 
     db.getUser(oldMsg.author.id, oldMsg.author.username, (user: Object) => {
