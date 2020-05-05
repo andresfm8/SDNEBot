@@ -53,10 +53,11 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
 
     } else if (years.includes(eName) && rct.message.id === assignId) {
 
-        rct.message.reactions.cache.forEach(async function (r) {
-            let usersR = await r.users.fetch()
-            if (r.emoji.name != eName && usersR.array().includes(user) && !campus.includes(r.emoji.name))
-                r.users.remove(user)
+        rct.message.reactions.cache.forEach(function (r) {
+            r.users.fetch().then(usersR => {
+                if (r.emoji.name != eName && usersR.array().includes(user) && !campus.includes(r.emoji.name))
+                r.users.remove(user).catch(err => console.error(err))
+            })
         })
 
         if (member.roles.cache.array().includes(roles['👻']))
@@ -74,10 +75,11 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
 
     } else if (campus.includes(eName) && rct.message.id === assignId) {
 
-        rct.message.reactions.cache.forEach(async function (r) {
-            let users = await r.users.fetch()
-            if (r.emoji.name != eName && users.array().includes(user) && !years.includes(r.emoji.name))
-                r.users.remove(user)
+        rct.message.reactions.cache.forEach(function (r) {
+            r.users.fetch().then(usersR => {
+                if (r.emoji.name != eName && usersR.array().includes(user) && !campus.includes(r.emoji.name))
+                r.users.remove(user).catch(err => console.error(err))
+            })
         })
 
         member.roles.remove([roles['1️⃣'], roles['2️⃣']], 'Removed Conflicting Campuses').then(() => {
