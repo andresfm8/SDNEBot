@@ -23,6 +23,10 @@ bot.on('ready', () => {
             })
         })
     })
+
+    setTimeout(() => {
+        process.exit(0)
+    }, 9e+6)
 })
 
 // Listen for Members joining
