@@ -214,6 +214,7 @@ export function handleMessage(msg: Discord.Message) {
 
         // Restarts Bot
         if (m.startsWith('!restart')) {
+            msg.react('👌')
             process.exit(0)
         }
     }
