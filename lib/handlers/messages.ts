@@ -211,6 +211,11 @@ export function handleMessage(msg: Discord.Message) {
 
             return
         }
+
+        // Restarts Bot
+        if (m.startsWith('!restart')) {
+            process.exit(0)
+        }
     }
 
     // For commands that inhibit user's speaking privs and/or could result in an auto kick
