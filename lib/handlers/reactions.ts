@@ -63,13 +63,14 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
         if (member.roles.cache.array().includes(roles['👻']))
             var newUser = true
 
-        member.roles.remove([roles['📗'], roles['📘'], roles['📙'], roles['🧾'], roles['👻']], 'Removed Conflicting Years').then(async () => {
+        member.roles.remove([roles['📗'], roles['📘'], roles['📙'], roles['🧾'], roles['👻']], 'Removed Conflicting Years').then(() => {
             member.roles.add(roles[eName], `Added ${roles[eName].name}`).catch(err => console.error(err))
 
             if (newUser) {
-                let id = await db.getConfig('generalChannel')
-                let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
-                channel.send(`**Welcome <@${member.user.id}> !**`)
+                db.getConfig('generalChannel').then((id) => {
+                    let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
+                    channel.send(`**Welcome <@${member.user.id}> !**`)
+                })
             }
         }).catch(err => console.error(err))
 
@@ -77,7 +78,7 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
 
         rct.message.reactions.cache.forEach(function (r) {
             r.users.fetch().then(usersR => {
-                if (r.emoji.name != eName && usersR.array().includes(user) && !campus.includes(r.emoji.name))
+                if (r.emoji.name != eName && usersR.array().includes(user) && !years.includes(r.emoji.name))
                 r.users.remove(user).catch(err => console.error(err))
             })
         })
