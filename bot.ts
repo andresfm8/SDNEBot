@@ -14,6 +14,7 @@ export const bot = new Discord.Client({ partials: Object.values(Discord.Constant
 // Bot startup
 bot.on('ready', () => {
     console.log(`Logged in as ${bot.user.tag}`)
+    bot.user.setPresence({ activity: { type: 'WATCHING', name: 'for !help' }, status: 'online' })
 
     db.getRoles((res: Array<Object>) => {
         res.forEach(resRole => {
@@ -33,7 +34,7 @@ bot.on('ready', () => {
 bot.on('guildMemberAdd', member => handleNewMember(member))
 
 // Listen for Messages
-bot.on('message', message => handleMessage(message) )
+bot.on('message', message => handleMessage(message))
 
 // Listen for Message Deletions
 bot.on('messageDelete', message => handleMessageDelete(message))
