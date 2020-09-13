@@ -15,11 +15,14 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
         }
     ]
 
+    tips.push({ 'name': 'User(s\') Info', 'value': '```!info @user[]```' })
+
+    tips.push({ 'name': 'View RateMyProfessor info', 'value': '```!rmp profName```'})
+
     if (member.hasPermission(Permissions.FLAGS.MANAGE_ROLES))
         tips.push({ 'name': 'Assign Roles Embed', 'value': '```!assignInfo```' })
 
     if (member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        tips.push({ 'name': 'User(s\') Info', 'value': '```!info @user[]```' })
         tips.push({ 'name': 'Cleanup Messages', 'value': '```!cleanup #num_messages```' })
     }
 

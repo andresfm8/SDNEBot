@@ -1,11 +1,13 @@
 import * as Discord from 'discord.js'
 import * as db from '../../database'
 
+import { parse } from 'node-html-parser';
 import { Timestamp } from 'mongodb'
 import { Permissions } from 'discord.js'
 import { bot } from '../../bot'
 import { setHelpPage, rules } from '../globVars'
 import { help, hasAttachment, hasURL } from '../funcs'
+import Axios from 'axios'
 
 export function handleMessage(msg: Discord.Message) {
     if (msg.author.bot || msg.system || msg.channel.type === 'dm')
@@ -23,6 +25,150 @@ export function handleMessage(msg: Discord.Message) {
     // View Help Menu
     if (m.startsWith('!help')) {
         setHelpPage(help(msg.member, 0, msg.channel))
+        return
+    }
+
+    // View RateMyProfessor Data
+    if (m.startsWith('!rmp')) {
+        if (m.indexOf(' ') === -1) {
+            msg.react('❓')
+            return
+        }
+
+        let professor: string = m.slice(m.indexOf(' ') + 1, m.length)
+        let findId = Number(professor)
+        if (isNaN(findId)) {
+
+            let names: string[] = professor.split(' ')
+            professor = ''
+            names.forEach((n, i) => {
+                if (i == names.length - 1)
+                    professor += n
+                else
+                    professor += `${n}+`
+            })
+
+            let profSearchURL: string = `https://www.ratemyprofessors.com/search.jsp?queryoption=HEADER&queryBy=teacherName&schoolName=Sheridan+College&schoolID=&query=${professor}`
+            // console.log(profSearchURL)
+
+            try {
+                Axios.get(profSearchURL).then(res => {
+                    let listings = parse(res.data).querySelectorAll('.PROFESSOR')
+
+                    type prof = {
+                        id: number,
+                        name: string,
+                        role: string
+                    }
+
+                    let foundProfs: prof[] = []
+                    listings.forEach((l, i) => {
+                        let url = l.querySelector('a').getAttribute("href")
+                        let id = Number(url.slice(21))
+                        let name = l.querySelector('.main').text
+                        let role = l.querySelector('.sub').text
+                        // console.log(`${name}\n${role}\n${url}\n${id}`)
+                        foundProfs.push({ id: id, name: name, role: role })
+                    })
+
+                    if (foundProfs.length == 0) {
+                        // No Profs Found
+                        return
+                    }
+
+                    if (foundProfs.length > 1) {
+                        let fields = []
+
+                        foundProfs.forEach(prof => {
+                            fields.push({
+                                "name": prof.name,
+                                "value": `${prof.role}\n\`\`\`!rmp ${prof.id}\`\`\``
+                            })
+                        })
+
+                        let multiEmbed = {
+                            "embed": {
+                                "title": "Multiple Professors Found",
+                                "url": profSearchURL,
+                                "description": "Please choose one",
+                                "color": 4886754,
+                                "footer": {
+                                    "icon_url": "https://www.ratemyprofessors.com/images/favicon-32.png",
+                                    "text": "RateMyProfessors"
+                                },
+                                "fields": fields
+                            }
+                        }
+
+                        msg.channel.send(multiEmbed)
+                    } else {
+                        singleProf(foundProfs[0].id, msg)
+                    }
+                })
+            } catch (exception) {
+                process.stderr.write(`ERROR received from ${profSearchURL}: ${exception}\n`);
+            }
+        } else {
+            singleProf(findId, msg)
+        }
+
+        return
+    }
+
+    // Displays Info on user
+    if (m.startsWith('!info')) {
+        if (msg.mentions.users.first() === undefined) {
+            msg.react('❓')
+            return
+        }
+
+        msg.mentions.users.array().forEach(mention => {
+            let nick = (msg.guild.member(mention).nickname ? msg.guild.member(mention).nickname : mention.username)
+
+            db.getUser(mention.id, mention.username, (userData: Object) => {
+                let time: Timestamp = userData['lastUpdated']
+
+                let embed = {
+                    'embed': {
+                        'title': `${nick}'s Information`,
+                        'description': `Get a user's information`,
+                        'color': 3553599,
+                        'timestamp': new Date(time.toNumber()),
+                        'footer': {
+                            'text': 'Last Updated'
+                        },
+                        'fields': [
+                            {
+                                'name': 'Warns',
+                                'value': `\`\`\`${userData['warns']}\`\`\``,
+                                'inline': true
+                            },
+                            {
+                                'name': 'Kicks',
+                                'value': `\`\`\`${userData['kicks']}\`\`\``,
+                                'inline': true
+                            },
+                            {
+                                'name': 'Muted',
+                                'value': `\`\`\`${userData['muted']}\`\`\``,
+                                'inline': true
+                            },
+                            {
+                                'name': 'Contribution Points',
+                                'value': `\`\`\`${userData['cbp']}\`\`\``,
+                                'inline': true
+                            }
+                        ]
+                    }
+                }
+
+                if (mention.avatarURL() !== null)
+                    embed['embed']['thumbnail'] = { 'url': mention.avatarURL({ dynamic: true, size: 4096 }) }
+
+                msg.channel.send(embed)
+            })
+        })
+
         return
     }
 
@@ -112,63 +258,6 @@ export function handleMessage(msg: Discord.Message) {
     // For commands that modify messages or require at least Mod role
     if (msg.member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES)) {
         let color = 3553599
-
-        // Displays Info on user
-        if (m.startsWith('!info')) {
-            if (msg.mentions.users.first() === undefined) {
-                msg.react('❓')
-                return
-            }
-
-            msg.mentions.users.array().forEach(mention => {
-                let nick = (msg.guild.member(mention).nickname ? msg.guild.member(mention).nickname : mention.username)
-
-                db.getUser(mention.id, mention.username, (userData: Object) => {
-                    let time: Timestamp = userData['lastUpdated']
-
-                    let embed = {
-                        'embed': {
-                            'title': `${nick}'s Information`,
-                            'description': `Get a user's information`,
-                            'color': color,
-                            'timestamp': new Date(time.toNumber()),
-                            'footer': {
-                                'text': 'Last Updated'
-                            },
-                            'fields': [
-                                {
-                                    'name': 'Warns',
-                                    'value': `\`\`\`${userData['warns']}\`\`\``,
-                                    'inline': true
-                                },
-                                {
-                                    'name': 'Kicks',
-                                    'value': `\`\`\`${userData['kicks']}\`\`\``,
-                                    'inline': true
-                                },
-                                {
-                                    'name': 'Muted',
-                                    'value': `\`\`\`${userData['muted']}\`\`\``,
-                                    'inline': true
-                                },
-                                {
-                                    'name': 'Contribution Points',
-                                    'value': `\`\`\`${userData['cbp']}\`\`\``,
-                                    'inline': true
-                                }
-                            ]
-                        }
-                    }
-
-                    if (mention.avatarURL() !== null)
-                        embed['embed']['thumbnail'] = { 'url': mention.avatarURL({ dynamic: true, size: 4096 }) }
-
-                    msg.channel.send(embed)
-                })
-            })
-
-            return
-        }
 
         // Cleans up Messages
         if (m.startsWith('!cleanup')) {
@@ -434,4 +523,84 @@ export async function handleMessageEdit(oldMsg: Discord.Message | Discord.Partia
     let newContent = newMsg.content.replace(/`/g, '')
 
     channel.send(`**${nick} changed their message in <#${oldMsg.channel.id}> from:**\`\`\`${oldContent}\`\`\`**to:**\`\`\`${newContent}\`\`\``)
+}
+
+function singleProf(findId: number, msg: Discord.Message) {
+    let idUrl: string = `https://www.ratemyprofessors.com/ShowRatings.jsp?tid=${findId}`
+    // console.log(idUrl)
+    try {
+        Axios.get(idUrl).then(res => {
+            type prof = {
+                id: number,
+                name: string,
+                score: number,
+                role: string,
+                retake: string,
+                level: number,
+                highlightReview: string
+            }
+
+            let html = parse(res.data)
+            let p: prof = { id: 0, name: '', score: 0, role: '', retake: '', level: 0, highlightReview: '' }
+
+            p.id = findId
+            p.name = `${html.querySelector('.jeLOXk').firstChild.text} ${html.querySelector('.glXOHH').firstChild.text}`
+            p.role = `${html.querySelector('.hfQOpA').firstChild.childNodes[1].text}`
+            p.score = parseFloat(html.querySelector('.gxuTRq').text)
+
+            try {
+                p.retake = `${html.querySelector('.jCDePN').firstChild.childNodes[0].text}`
+            } catch {
+                p.retake = '0%'
+            }
+
+            try {
+                p.level = parseFloat(html.querySelector('.jCDePN').childNodes[1].childNodes[0].text)
+            } catch {
+                p.level = 0
+            }
+
+            try {
+                p.highlightReview = `${html.querySelector('.dvnRbr').text}`
+            } catch {
+                p.highlightReview = `Bummer, ${p.name} doesn’t have any featured ratings`
+            }
+
+            let profEmbed = {
+                "embed": {
+                    "title": `${p.name}`,
+                    "url": `https://www.ratemyprofessors.com/ShowRatings.jsp?tid=${p.id}`,
+                    "description": `Professor in the **${p.role}**`,
+                    "color": 4886754,
+                    "footer": {
+                        "icon_url": "https://www.ratemyprofessors.com/images/favicon-32.png",
+                        "text": "RateMyProfessors"
+                    },
+                    "thumbnail": {
+                        "url": `https://dummyimage.com/256x256/fff.png&text=${p.score}`
+                    },
+                    "fields": [
+                        {
+                            "name": "🔁 Would Retake?",
+                            "value": `\`\`\`${p.retake} say YES\`\`\``,
+                            "inline": true
+                        },
+                        {
+                            "name": "⛓ Difficulty",
+                            "value": `\`\`\`${p.level} / 5\`\`\``,
+                            "inline": true
+                        },
+                        {
+                            "name": "🗨 Top Review",
+                            "value": `\`\`\`${p.highlightReview}\`\`\``
+                        }
+                    ]
+                }
+            }
+
+            msg.channel.send(profEmbed)
+        })
+    } catch (exception) {
+        process.stderr.write(`ERROR received from ${idUrl}: ${exception}\n`);
+    }
 }
