@@ -10,12 +10,14 @@ import { help, hasAttachment, hasURL } from '../funcs'
 import Axios from 'axios'
 
 export function handleMessage(msg: Discord.Message) {
-    if (msg.author.bot || msg.system || msg.channel.type === 'dm')
+    if (msg.author.bot || msg.system || msg.channel.type === 'dm' || msg.channel.type === 'news')
         return
 
     db.getUser(msg.author.id, msg.author.username, (user: Object) => {
-        if (user['muted'] === true)
+        if (user['muted'] === true) {
             msg.delete()
+            return
+        }
     })
 
     db.updateUser(msg.author.id, msg.author.username, undefined, undefined, undefined, (msg.content.length / 50) | 0, true)
@@ -55,6 +57,11 @@ export function handleMessage(msg: Discord.Message) {
                 Axios.get(profSearchURL).then(res => {
                     let listings = parse(res.data).querySelectorAll('.PROFESSOR')
 
+                    if (listings.length < 1) {
+                        msg.reply('I had trouble finding that professor. Please double check your spelling!')
+                        return
+                    }
+
                     type prof = {
                         id: number,
                         name: string,
@@ -72,7 +79,7 @@ export function handleMessage(msg: Discord.Message) {
                     })
 
                     if (foundProfs.length == 0) {
-                        // No Profs Found
+                        msg.reply('I had trouble finding that professor. Please double check your spelling!')
                         return
                     }
 
@@ -106,7 +113,9 @@ export function handleMessage(msg: Discord.Message) {
                     }
                 })
             } catch (exception) {
-                process.stderr.write(`ERROR received from ${profSearchURL}: ${exception}\n`);
+                msg.reply('I had trouble finding that professor. Please double check your spelling!')
+                console.error(exception)
+                return
             }
         } else {
             singleProf(findId, msg)
@@ -505,9 +514,9 @@ export function handleMessage(msg: Discord.Message) {
 
 export async function handleMessageDelete(msg: Discord.Message | Discord.PartialMessage) {
     try {
-        if (msg.partial) await msg.fetch()
+        if (msg.partial) await msg.fetch().catch(err => console.error(err))
 
-        if (msg.author.bot || msg.system || msg.channel.type === 'dm')
+        if (msg.author.bot || msg.system || msg.channel.type === 'dm' || msg.channel.type === 'news')
             return
 
         let id = await db.getConfig('deletedChannel')
@@ -520,7 +529,7 @@ export async function handleMessageDelete(msg: Discord.Message | Discord.Partial
 
         let content = msg.content.replace(/`/g, '')
 
-        channel.send(`**${nick}'s message in <#${msg.channel.id}> was deleted:**\`\`\`${content}\`\`\``)
+        channel.send(`**${nick}'s message in <#${msg.channel.id}> was deleted:**\`\`\`${content}\`\`\``).catch(err => console.error(err))
     } catch (exception) {
         console.error(exception)
     }
@@ -531,7 +540,7 @@ export async function handleMessageEdit(oldMsg: Discord.Message | Discord.Partia
         if (oldMsg.partial) await oldMsg.fetch()
         if (newMsg.partial) await newMsg.fetch()
 
-        if (newMsg.author.bot || newMsg.channel.type === 'dm')
+        if (newMsg.author.bot || newMsg.system || newMsg.channel.type === 'dm' || newMsg.channel.type === 'news')
             return
 
         db.getUser(newMsg.author.id, newMsg.author.username, (user: Object) => {
@@ -558,6 +567,11 @@ function singleProf(findId: number, msg: Discord.Message) {
     // console.log(idUrl)
     try {
         Axios.get(idUrl).then(res => {
+            if (res.status === 301 || res.status === 404) {
+                msg.reply('I had trouble finding that professor. Please double check your spelling!')
+                return
+            }
+
             type prof = {
                 id: number,
                 name: string,
@@ -627,8 +641,12 @@ function singleProf(findId: number, msg: Discord.Message) {
             }
 
             msg.channel.send(profEmbed)
+        }).catch(err => {
+            msg.reply('I had trouble finding that professor. Please double check your spelling!')
+            console.error(err)
+            return
         })
     } catch (exception) {
-        process.stderr.write(`ERROR received from ${idUrl}: ${exception}\n`);
+        console.error(exception)
     }
 }
