@@ -16,14 +16,37 @@ bot.on('ready', () => {
     console.log(`Logged in as ${bot.user.tag}`)
     bot.user.setPresence({ activity: { type: 'WATCHING', name: 'for !help' }, status: 'online' })
 
-    db.getRoles((res: Array<Object>) => {
-        res.forEach(resRole => {
-            bot.guilds.cache.first().roles.cache.forEach(role => {
-                if (resRole['rid'] == role.id)
-                    roles[resRole['name']] = role
-            })
+    let roleList = [{
+        "name": "📗",
+        "rid": "619581998574469120"
+    }, {
+        "name": "📘",
+        "rid": "619582112936362020"
+    }, {
+        "name": "📙",
+        "rid": "619582159899852802"
+    }, {
+        "name": "🧾",
+        "rid": "619582173522952233"
+    }, {
+        "name": "1️⃣",
+        "rid": "620641262101463070"
+    }, {
+        "name": "2️⃣",
+        "rid": "620641321908043798"
+    }, {
+        "name": "👻",
+        "rid": "663060867490775071"
+    }]
+
+
+    roleList.forEach(resRole => {
+        bot.guilds.cache.first().roles.cache.forEach(role => {
+            if (resRole.rid == role.id)
+                roles[resRole.name] = role
         })
     })
+
 
     // setTimeout(() => {
     //     process.exit(0)
