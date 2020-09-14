@@ -37,10 +37,10 @@ bot.on('guildMemberAdd', member => handleNewMember(member))
 bot.on('message', message => handleMessage(message))
 
 // Listen for Message Deletions
-bot.on('messageDelete', message => handleMessageDelete(message))
+// bot.on('messageDelete', message => handleMessageDelete(message))
 
 // Listen for Message Edits
-bot.on('messageUpdate', (oldMessage, newMessage) => handleMessageEdit(oldMessage, newMessage))
+// bot.on('messageUpdate', (oldMessage, newMessage) => handleMessageEdit(oldMessage, newMessage))
 
 // Listen for Reactions
 bot.on('messageReactionAdd', (reaction, user) => { handleReactionAdd(reaction, user) })
