@@ -26,5 +26,5 @@ export async function handleNewMember(member: Discord.GuildMember | Discord.Part
 
     member.send(`**Welcome to the SDNE Discord!**\nMake sure to assign your year and campus using the corresponding\nreactions in <#${id}> in order to access all the channels!\nDM ${admins} if you need help.`)
 
-    member.roles.add(roles['👻'])
+    member.roles.add(roles['👻']).catch(err => console.error(err))
 }

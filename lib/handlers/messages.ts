@@ -307,6 +307,26 @@ export function handleMessage(msg: Discord.Message) {
                 process.exit(0)
             })
         }
+
+        // Show Intros Instructions Embed
+        if (m.startsWith('!introinfo')) {
+            let desc: string = ''
+            desc += `Welcome to the introduction channel! This is the place to introduce yourself, make new friends and to connect with your fellow peers! We highly encourage you all connect with eachother, don't be shy. Who knows, maybe the friends you make will be your group in a hackathon? `
+            desc += `\n\nReady to introduce yourself? Follow the format below, you don't have to follow it exactly but it's a good guideline. You can add your socials (LinkedIn, GitHub, Instagram, Twitter, etc) if you have any, we recommend making a LinkedIn if you don't have one already, it's a good networking tool in the industry.`
+            desc += `\n\`\`\`Name:\n\nProgram:\n\nYear/Semester:\n\nAbout You (Hobbies/Passions):\n\nSocials (LinkedIn, GitHub, Instagram, Twitter, etc):\`\`\``
+
+            let introEmbed = {
+                "embed": {
+                    "title": "Introduction Info",
+                    "description": desc,
+                    "color": 3553599
+                }
+            }
+
+            msg.channel.send(introEmbed)
+            msg.delete()
+            return
+        }
     }
 
     // For commands that inhibit user's speaking privs and/or could result in an auto kick
@@ -480,49 +500,57 @@ export function handleMessage(msg: Discord.Message) {
     }
 
     if (hasAttachment(msg) || hasURL(msg))
-        msg.react('👍').then(() => msg.react('👎').then(() => { msg.react('📌') }))
+        msg.react('👍').then(() => msg.react('👎').then(() => { msg.react('📌').catch(err => console.error(err)) }).catch(err => console.error(err))).catch(err => console.error(err))
 }
 
 export async function handleMessageDelete(msg: Discord.Message | Discord.PartialMessage) {
-    if (msg.partial) await msg.fetch()
+    try {
+        if (msg.partial) await msg.fetch()
 
-    if (msg.author.bot || msg.system || msg.channel.type === 'dm')
-        return
+        if (msg.author.bot || msg.system || msg.channel.type === 'dm')
+            return
 
-    let id = await db.getConfig('deletedChannel')
-    let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
+        let id = await db.getConfig('deletedChannel')
+        let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
 
-    if (msg.channel === channel)
-        return
+        if (msg.channel === channel)
+            return
 
-    let nick = (msg.member.nickname ? msg.member.nickname : msg.author.username)
+        let nick = (msg.member.nickname ? msg.member.nickname : msg.author.username)
 
-    let content = msg.content.replace(/`/g, '')
+        let content = msg.content.replace(/`/g, '')
 
-    channel.send(`**${nick}'s message in <#${msg.channel.id}> was deleted:**\`\`\`${content}\`\`\``)
+        channel.send(`**${nick}'s message in <#${msg.channel.id}> was deleted:**\`\`\`${content}\`\`\``)
+    } catch (exception) {
+        console.error(exception)
+    }
 }
 
 export async function handleMessageEdit(oldMsg: Discord.Message | Discord.PartialMessage, newMsg: Discord.Message | Discord.PartialMessage) {
-    if (oldMsg.partial) await oldMsg.fetch()
-    if (newMsg.partial) await newMsg.fetch()
+    try {
+        if (oldMsg.partial) await oldMsg.fetch()
+        if (newMsg.partial) await newMsg.fetch()
 
-    if (newMsg.author.bot || newMsg.channel.type === 'dm')
-        return
+        if (newMsg.author.bot || newMsg.channel.type === 'dm')
+            return
 
-    db.getUser(newMsg.author.id, newMsg.author.username, (user: Object) => {
-        if (user['muted'] === true)
-            newMsg.delete()
-    })
+        db.getUser(newMsg.author.id, newMsg.author.username, (user: Object) => {
+            if (user['muted'] === true)
+                newMsg.delete()
+        })
 
-    let id = await db.getConfig('editedChannel')
-    let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
+        let id = await db.getConfig('editedChannel')
+        let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
 
-    let nick = (newMsg.member.nickname ? newMsg.member.nickname : newMsg.author.username)
+        let nick = (newMsg.member.nickname ? newMsg.member.nickname : newMsg.author.username)
 
-    let oldContent = oldMsg.content.replace(/`/g, '')
-    let newContent = newMsg.content.replace(/`/g, '')
+        let oldContent = oldMsg.content.replace(/`/g, '')
+        let newContent = newMsg.content.replace(/`/g, '')
 
-    channel.send(`**${nick} changed their message in <#${oldMsg.channel.id}> from:**\`\`\`${oldContent}\`\`\`**to:**\`\`\`${newContent}\`\`\``)
+        channel.send(`**${nick} changed their message in <#${oldMsg.channel.id}> from:**\`\`\`${oldContent}\`\`\`**to:**\`\`\`${newContent}\`\`\``)
+    } catch (exception) {
+        console.error(exception)
+    }
 }
 
 function singleProf(findId: number, msg: Discord.Message) {
