@@ -506,10 +506,10 @@ export async function handleMessageEdit(oldMsg: Discord.Message | Discord.Partia
     if (oldMsg.partial) await oldMsg.fetch()
     if (newMsg.partial) await newMsg.fetch()
 
-    if (oldMsg.author.bot || oldMsg.channel.type === 'dm')
+    if (newMsg.author.bot || newMsg.channel.type === 'dm')
         return
 
-    db.getUser(oldMsg.author.id, oldMsg.author.username, (user: Object) => {
+    db.getUser(newMsg.author.id, newMsg.author.username, (user: Object) => {
         if (user['muted'] === true)
             newMsg.delete()
     })
@@ -517,7 +517,7 @@ export async function handleMessageEdit(oldMsg: Discord.Message | Discord.Partia
     let id = await db.getConfig('editedChannel')
     let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
 
-    let nick = (oldMsg.member.nickname ? oldMsg.member.nickname : oldMsg.author.username)
+    let nick = (newMsg.member.nickname ? newMsg.member.nickname : newMsg.author.username)
 
     let oldContent = oldMsg.content.replace(/`/g, '')
     let newContent = newMsg.content.replace(/`/g, '')
