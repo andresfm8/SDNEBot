@@ -208,7 +208,7 @@ export function handleMessage(msg: Discord.Message) {
         return
     }
     
-    // View Rules
+    // Tableflip Reaction
     if (m.startsWith('(╯°□°）╯︵ ┻━┻') || m.startsWith('/tableflip')) {
         msg.reply('┬─┬ ノ( ゜-゜ノ)')
     }
