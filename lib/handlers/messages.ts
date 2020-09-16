@@ -207,6 +207,11 @@ export function handleMessage(msg: Discord.Message) {
 
         return
     }
+    
+    // Tableflip Reaction
+    if (m.startsWith('(╯°□°）╯︵ ┻━┻') || m.startsWith('/tableflip')) {
+        msg.reply('┬─┬ ノ( ゜-゜ノ)')
+    }
 
     // For commands that modify Roles
     if (msg.member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)) {
