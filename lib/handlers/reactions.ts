@@ -69,7 +69,7 @@ export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Disco
                     if (newUser) {
                         db.getConfig('generalChannel').then((id) => {
                             let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
-                            channel.send(`**Welcome <@${member.user.id}> !**`)
+                            channel.send(`**Welcome <@${member.user.id}> !**\nFeel free to introduce yourself in <#754165320624898129> !`)
                         })
                     }
                 }).catch(err => console.error(err))

@@ -602,6 +602,11 @@ function singleProf(findId: number, msg: Discord.Message) {
                 p.level = 0
             }
 
+            if (p.retake.indexOf('%') === -1) {
+                    p.level = Number(p.retake)
+                    p.retake = '0%'
+            }
+
             try {
                 p.highlightReview = `${html.querySelector('.dvnRbr').text}`
             } catch {
