@@ -208,6 +208,11 @@ export function handleMessage(msg: Discord.Message) {
         return
     }
     
+    // Github Free Stuff
+    if (m.startsWith('!free') || m.startsWith('!hosting')) {
+        msg.reply('https://educate.scuffdesign.co/articles/getting-github-student-developer-pack')
+    }
+
     // Tableflip Reaction
     if (m.startsWith('(╯°□°）╯︵ ┻━┻') || m.startsWith('/tableflip')) {
         msg.reply('┬─┬ ノ( ゜-゜ノ)')
