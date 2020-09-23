@@ -15,6 +15,8 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
         }
     ]
 
+    tips.push({ 'name': 'Create Channel', 'value': '```!make channelName```'})
+
     tips.push({ 'name': 'User(s\') Info', 'value': '```!info @user[]```' })
 
     tips.push({ 'name': 'View RateMyProfessor info', 'value': '```!rmp profName```'})
