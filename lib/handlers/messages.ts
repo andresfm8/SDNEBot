@@ -5,7 +5,7 @@ import { parse } from 'node-html-parser';
 import { Timestamp } from 'mongodb'
 import { Permissions } from 'discord.js'
 import { bot } from '../../bot'
-import { setHelpPage, rules } from '../globVars'
+import { setHelpPage, rules, roles } from '../globVars'
 import { help, hasAttachment, hasURL } from '../funcs'
 import Axios from 'axios'
 
@@ -216,6 +216,46 @@ export function handleMessage(msg: Discord.Message) {
     // Tableflip Reaction
     if (m.startsWith('(╯°□°）╯︵ ┻━┻') || m.startsWith('/tableflip')) {
         msg.reply('┬─┬ ノ( ゜-゜ノ)')
+    }
+
+    // Create Channel for Year
+    if (m.startsWith('!make')) {
+        if (m.indexOf(' ') === -1) {
+            msg.react('❓')
+            return
+        }
+
+        let channelName: string = m.slice(m.indexOf(' ') + 1, m.length)
+
+        let created = false
+
+        msg.member.roles.cache.forEach(r => {
+            if (r == roles['📗']) {
+                msg.guild.channels.create(channelName, {parent: msg.guild.channels.resolve('619658210319663115'), topic: `Created by **${msg.member.nickname}**`}).then(() => {
+                    msg.react('👌')
+                })
+                created = true
+                return
+            } else if (r == roles['📘']) {
+                msg.guild.channels.create(channelName, {parent: msg.guild.channels.resolve('619658294033645571'), topic: `Created by **${msg.member.nickname}**`}).then(() => {
+                    msg.react('👌')
+                })
+                created = true
+                return
+            } else if (r == roles['📙']) {
+                msg.guild.channels.create(channelName, {parent: msg.guild.channels.resolve('619658336778059806'), topic: `Created by **${msg.member.nickname}**`}).then(() => {
+                    msg.react('👌')
+                })
+                created = true
+                return
+            }
+        })
+
+        if (!created) {
+            msg.reply('you need to assign a year before creating channels!')
+        }
+
+        return
     }
 
     // For commands that modify Roles
