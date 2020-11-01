@@ -11,7 +11,7 @@ import * as Discord from 'discord.js';
 import * as db from '../../database';
 import { bot } from '../../bot';
 import { help, hasAttachment } from '../funcs';
-import { helpPage, setHelpPage, roles } from '../globVars';
+import { helpPage, setHelpPage, roles, generalChannel, introductionChannel } from '../globVars';
 
 /**
  *
@@ -24,7 +24,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 	// Try the following and catch any errors that occur
 	try {
 		// Await the reaction
-		await reaction.message.fetch().catch(err => console.error(err));
+		await reaction.message.fetch().catch(error => console.error(error));
 
 		// Fetch the user for processing
 		user.fetch().then(async user => {
@@ -44,11 +44,11 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 			});
 
 			// Create the required variables
-			let assign_role_message_id = await db.getConfig('assign').catch(err => console.error(err));
+			let assign_role_message_id = await db.getConfig('assign').catch(error => console.error(error));
 			let assign_years = ['📗', '📘', '📙', '🧾'];
 			let assign_campus = ['1️⃣', '2️⃣'];
 			var member: Discord.GuildMember;
-			var newUser: Boolean = false;
+			var new_user: Boolean = false;
 			let emoji_name: string = reaction.emoji.name;
 			let users: Discord.Collection<string, Discord.User> = await reaction.users.fetch();
 
@@ -90,16 +90,16 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 				// Check to see if the member has the unassigned role
 				if(member.roles.cache.array().includes(roles['👻'])) {
 					// specify that the user is new
-					newUser = true;
+					new_user = true;
 				}
 
 				// Remove all of the year roles from the user and also the unassigned role
-				member.roles.remove([roles['📗'], roles['📘'], roles['📙'], roles['🧾'], roles['👻']], 'Removed Conflicting year roles').then(async () => {
+				member.roles.remove([roles['📗'], roles['📘'], roles['📙'], roles['🧾'], roles['👻']], 'Removed conflicting year roles').then(async () => {
 					// Add the desired year role to the member
 					member.roles.add(roles[emoji_name], `Added ${roles[emoji_name].name}`).catch(err => console.error(err));
 
 					// Check to see if the user is new
-					if(newUser) {
+					if(new_user) {
 						// Grab the general channel
 						var general_channel = await db.getConfig('generalChannel');
 
@@ -107,7 +107,14 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 						if(general_channel !== undefined) {
 							// Grab the channel instance and then post the welcome message
 							let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(general_channel);
-							channel.send(`**Welcome <@${member.user.id}> !**\nFeel free to introduce yourself in <#754165320624898129> !`);
+							channel.send(`**Welcome <@${member.user.id}>!**\nFeel free to introduce yourself in <#${introductionChannel}>!`);
+						}else{
+							// Update the general column value
+							await db.updateConfig('generalChannel', generalChannel);
+
+							// Grab the channel instance and then post the welcome message
+							let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(generalChannel);
+							channel.send(`**Welcome <@${member.user.id}>!**\nFeel free to introduce yourself in <#${introductionChannel}>!`);
 						}
 					}
 				}).catch(error => console.error(error));
@@ -154,7 +161,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 				// Update the users contribution points
 				db.updateUser(author.id, author.username, undefined, undefined, undefined, 1, true);
 			}
-		})
+		});
 	}catch(exception) {
 		// Log the error to the console
 		console.error(exception);

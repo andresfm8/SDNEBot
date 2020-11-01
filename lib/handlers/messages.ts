@@ -302,18 +302,17 @@ export function handleMessage(msg: Discord.Message) {
 		return
 	}
 
-	// For commands that modify Roles
-	if (msg.member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)) {
-		let color = 33023
-
+	// Check to see if the message author has permissions to manage roles
+	if(msg.member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)) {
 		// Displays Role Assignment Embed
-		if (m.startsWith('!assigninfo')) {
+		if(m.startsWith('!assignInfo')) {
+			// Initialise the embed
 			let embed = {
 				'embed': {
 					'title': 'Role Assignment Info',
 					'description': 'Click a corresponding reaction to set your year & campus and gain access to the other channels!',
-					'color': color,
-					'timestamp':  moment().toDate(),
+					'color': 33023,
+					'timestamp':  new Date(),
 					'fields': [
 						{
 							'name': '📗',
@@ -347,19 +346,42 @@ export function handleMessage(msg: Discord.Message) {
 						}
 					]
 				}
-			}
-			msg.delete()
+			};
+
+			// Delete the users message
+			msg.delete();
+
+			// Send the embed to the channel
 			msg.channel.send(embed).then((m: Discord.Message) => {
-				m.react('📗').then(() => { m.react('📘').then(() => { m.react('📙').then(() => { m.react('🧾').then(() => { m.react('1️⃣').then(() => { m.react('2️⃣').then(() => { }) }) }) }) }) })
-				db.updateConfig('assign', m.id)
+				// Add the respective reactions to the message
+				m.react('📗').then(() => {
+					// React with the next respective command
+					m.react('📘').then(() => {
+						// React with the next respective command
+						m.react('📙').then(() => {
+							// React with the next respective command
+							m.react('🧾').then(() => {
+								// React with the next respective command
+								m.react('1️⃣').then(() => {
+									// React with the next respective command
+									m.react('2️⃣').then(() => {});
+								});
+							});
+						});
+					});
+				});
+
+				// Update the config value that will hold the assign roles id
+				db.updateConfig('assign', m.id);
 			})
 
-			return
+			// Return to stop further processing
+			return;
 		}
 	}
 
 	// For commands that modify messages or require at least Mod role
-	if (msg.member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES)) {
+	if(msg.member.hasPermission(Permissions.FLAGS.MANAGE_MESSAGES)) {
 		let color = 3553599
 
 		// Cleans up Messages
@@ -433,12 +455,12 @@ export function handleMessage(msg: Discord.Message) {
 	}
 
 	// For commands that inhibit user's speaking privs and/or could result in an auto kick
-	if (msg.member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) {
+	if(msg.member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) {
 		let color = 16725558
 
 		// Mute User(s)
-		if (m.startsWith('!mute')) {
-			if (msg.mentions.users.first() === undefined) {
+		if(m.startsWith('!mute')) {
+			if(msg.mentions.users.first() === undefined) {
 				msg.react('❓')
 				return
 			}
@@ -482,7 +504,7 @@ export function handleMessage(msg: Discord.Message) {
 		}
 
 		// Unmute User(s)
-		if (m.startsWith('!unmute')) {
+		if(m.startsWith('!unmute')) {
 			if (msg.mentions.users.first() === undefined) {
 				msg.react('❓')
 				return

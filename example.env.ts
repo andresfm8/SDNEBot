@@ -20,6 +20,8 @@ export interface Role {
 // Define the following env varibales
 export const botToken: string = '';
 export const dbFile: string = 'database.db';
+export const generalChannel: string = '772259249966809121';
+export const introductionChannel: string = '772578649765052416';
 export const localRoles = [
 	{
 		rid: '',

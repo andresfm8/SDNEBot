@@ -19,7 +19,7 @@ import * as moment from 'moment';
 // The following function is used to return a selected user
 export async function getUser(uid: string, name: string, callback: Function) {
 	// Query and store the user find in a variable
-	var user = await getConnection().getRepository(User).createQueryBuilder('user').where('user.uid = :uid', { uid: uid }).getOne();
+	var user = await getConnection().getRepository(User).createQueryBuilder('user').where('uid = :uid', { uid: uid }).getOne();
 
 	// Check to see if the user was found
 	if(user !== undefined) {
@@ -48,16 +48,16 @@ export async function getUser(uid: string, name: string, callback: Function) {
 // The following function is used to take in a key and then return the respective config value
 export async function getConfig(key: string) {
 	// Query and grab the respective config key
-	var config_key = await getConnection().getRepository(Config).createQueryBuilder('config').where('config.key = :key', { key: key }).getOne();
+	var config = await getConnection().getRepository(Config).createQueryBuilder('config').where('key = :key', { key: key }).getOne();
 
 	// Check to see if the config key is found
-	if(config_key !== undefined) {
+	if(config !== undefined) {
 		// Return the respective config key
-		return config_key.value;
+		return config.value;
 	}
 
 	// Return the config value
-	return
+	return;
 }
 
 /** Update or Insert a user in the Database */
@@ -117,7 +117,7 @@ export function updateUser(uid: string, name: string, warns?: number, kicks?: nu
 /** Update Bot Config Settings */
 export async function updateConfig(key: string, value: string) {
 	// Check to see if the config key doesn't exist already
-	if(getConfig(key) === undefined) {
+	if(await getConfig(key) === undefined) {
 		// Create the new key and store it into the database
 		await getConnection().getRepository(Config).createQueryBuilder().insert().into(Config).values({ key: key, value: value }).execute();
 
