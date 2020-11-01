@@ -34,6 +34,8 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
         tips.push({ 'name': 'Warn User(s)', 'value': '```!warn #rule_num @non_admin_user[]```' })
     }
 
+    tips.push({ 'name': 'Get days until an event (mainly holiday)', 'value': '```!daysUntil event name```'})
+
     let maxPages = Math.ceil(tips.length / 3)
 
     if (page > maxPages)
