@@ -5,7 +5,9 @@
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc bot.ts && node bot.js"
+    "start": "tsc bot.ts && node bot.js",
+    "run": "tsc bot.ts && node bot.js",
+    "serve": "tsc bot.ts && node bot.js"
   },
   "author": "Jacob Brasil",
   "license": "ISC",
