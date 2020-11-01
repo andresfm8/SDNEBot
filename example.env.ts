@@ -1,2 +1,2 @@
 export const botToken: string = ''
-export const dbPass: string = ''
+export const dbFile: string = 'database.db'

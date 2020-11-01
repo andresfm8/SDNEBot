@@ -23,8 +23,10 @@ The **SDNE Bot** or **Syndey** is a Discord Bot built for the **Software Design 
 2. Install Typescript
    1. `> npm install -g typescript`
    2. `> npx tsc`
-3. Clone/Fork Github repo and make the appropriate changes
-4. Create test Discord server if you don't already have one
+3. Install sqlite - https://www.servermania.com/kb/articles/install-sqlite/
+4. Clone/Fork Github repo and make the appropriate changes
+   1. Under the root directory, create an empty `database.db` file
+5. Create test Discord server if you don't already have one
    1. Create a new application under the [Discord developers portal](https://discordapp.com/developers/applications/)
    2. Add a new application
    3. Open the **Bot** tab and make a new bot
@@ -33,7 +35,7 @@ The **SDNE Bot** or **Syndey** is a Discord Bot built for the **Software Design 
       1. In the **General Information** tab, copy your **Client ID**
       2. Replace `<CLIENT_ID>` in the following URL with your **Client ID** above and navigate to the URL
       `https://discordapp.com/api/oauth2/authorize?client_id=<CLIENT_ID_HERE>&permissions=8&scope=bot`
-      3. Invite your bot to the testing server made in step 4.1
+      1. Invite your bot to the testing server made in step 4.1
 
 ### Setting up the Bot
 1. Duplicate the `env.example.ts` to `env.ts`

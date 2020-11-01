@@ -1,14 +1,13 @@
-import * as Discord from 'discord.js'
-import * as db from '../../database'
+import * as Discord from 'discord.js';
+import * as db from '../../database';
 
 import { parse } from 'node-html-parser';
-import { Timestamp } from 'mongodb'
-import { Permissions } from 'discord.js'
-import { bot } from '../../bot'
-import { setHelpPage, rules, roles } from '../globVars'
-import { help, hasAttachment, hasURL } from '../funcs'
-import Axios from 'axios'
-import moment from 'moment';
+import { Permissions } from 'discord.js';
+import { bot } from '../../bot';
+import { setHelpPage, rules, roles } from '../globVars';
+import { help, hasAttachment, hasURL } from '../funcs';
+import Axios from 'axios';
+import * as moment from 'moment';
 
 export function handleMessage(msg: Discord.Message) {
 	if (msg.author.bot || msg.system || msg.channel.type === 'dm' || msg.channel.type === 'news')
@@ -23,7 +22,7 @@ export function handleMessage(msg: Discord.Message) {
 
 	db.updateUser(msg.author.id, msg.author.username, undefined, undefined, undefined, (msg.content.length / 50) | 0, true)
 
-	var m: string = msg.content.toLowerCase().trim()
+	var m: string = msg.content.trim()
 
 	// View Help Menu
 	if (m.startsWith('!help')) {
@@ -136,14 +135,14 @@ export function handleMessage(msg: Discord.Message) {
 			let nick = (msg.guild.member(mention).nickname ? msg.guild.member(mention).nickname : mention.username)
 
 			db.getUser(mention.id, mention.username, (userData: Object) => {
-				let time: Timestamp = userData['lastUpdated']
+				let time: string = userData['lastUpdated']
 
 				let embed = {
 					'embed': {
 						'title': `${nick}'s Information`,
 						'description': `Get a user's information`,
 						'color': 3553599,
-						'timestamp': new Date(time.toNumber()),
+						'timestamp': moment(time).toDate(),
 						'footer': {
 							'text': 'Last Updated'
 						},
@@ -244,7 +243,10 @@ export function handleMessage(msg: Discord.Message) {
 		// Check to see if the requested event is not available in the events object
 		if(!(requested_event in events)) {
 			// Reply that they're missing an event name
-			msg.reply('Oops... requested event isn\'t currently supported. Feel free to make a PR and add the event!');
+			msg.reply('Oops... The requested event isn\'t currently supported. Feel free to make a PR and add the event!');
+
+			// Return to strop further processing
+			return;
 		}
 
 		// Calculate the days until the requeted event
@@ -257,7 +259,7 @@ export function handleMessage(msg: Discord.Message) {
 		}
 
 		// Reply to the user with the remaining days until the event
-		msg.reply(`${days_until_event} until ${events[requested_event]} !`);
+		msg.reply(`${days_until_event} day(s) until ${requested_event}!`);
 	}
 
 	// Create Channel for Year
@@ -311,7 +313,7 @@ export function handleMessage(msg: Discord.Message) {
 					'title': 'Role Assignment Info',
 					'description': 'Click a corresponding reaction to set your year & campus and gain access to the other channels!',
 					'color': color,
-					'timestamp': new Date(),
+					'timestamp':  moment().toDate(),
 					'fields': [
 						{
 							'name': '📗',
@@ -461,7 +463,7 @@ export function handleMessage(msg: Discord.Message) {
 				'embed': {
 					'title': `🔈 Mute Users`,
 					'color': color,
-					'timestamp': new Date(),
+					'timestamp':  moment().toDate(),
 					'fields': [
 						{
 							'name': 'Successfully Muted:',
@@ -506,7 +508,7 @@ export function handleMessage(msg: Discord.Message) {
 				'embed': {
 					'title': `🔊 Unmute Users`,
 					'color': color,
-					'timestamp': new Date(),
+					'timestamp':  moment().toDate(),
 					'fields': [
 						{
 							'name': 'Successfully Unmuted:',
@@ -545,7 +547,7 @@ export function handleMessage(msg: Discord.Message) {
 					'title': `🚩 Rule Violation`,
 					'description': 'You violated:',
 					'color': color,
-					'timestamp': new Date(),
+					'timestamp':  moment().toDate(),
 					'fields': [
 						{
 							'name': `**${rules[ruleNum - 1].title}**`,

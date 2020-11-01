@@ -104,3 +104,4 @@ public
 env.ts
 
 .vs/
+database.db

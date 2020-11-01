@@ -5,18 +5,20 @@
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc bot.ts && node bot.js",
-    "run": "tsc bot.ts && node bot.js",
-    "serve": "tsc bot.ts && node bot.js"
+    "start": "tsc bot.ts && node bot.js"
   },
   "author": "Jacob Brasil",
   "license": "ISC",
   "dependencies": {
-    "@types/mongodb": "^3.5.8",
     "axios": "^0.20.0",
     "discord.js": "^12.2.0",
     "moment": "^2.29.1",
-    "mongodb": "^3.5.6",
-    "node-html-parser": "^1.2.20"
+    "node-html-parser": "^1.2.20",
+    "reflect-metadata": "^0.1.13",
+    "sqlite3": "^5.0.0",
+    "typeorm": "^0.2.28"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.6"
   }
 }
