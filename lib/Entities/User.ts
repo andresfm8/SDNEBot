@@ -13,27 +13,27 @@ import { Entity, Unique, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 @Unique(['uid', 'name'])
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+	@PrimaryGeneratedColumn()
+	id: number;
 
-    @Column('varchar', { length: 250 })
-    uid: string;
+	@Column('varchar', { length: 250 })
+	uid: string;
 
-    @Column('varchar', { length: 500 })
-    name: string;
+	@Column('varchar', { length: 500 })
+	name: string;
 
-    @Column('varchar')
-    lastUpdated: string;
+	@Column('varchar')
+	lastUpdated: string;
 
-    @Column('int')
-    warns: number;
+	@Column('int')
+	warns: number;
 
-    @Column('int')
-    kicks: number;
+	@Column('int')
+	kicks: number;
 
-    @Column('boolean')
-    muted: boolean;
+	@Column('boolean')
+	muted: boolean;
 
-    @Column('int')
-    cbp: number;
+	@Column('int')
+	cbp: number;
 }

@@ -13,12 +13,12 @@ import { Entity, Unique, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 @Unique(['key'])
 export class Config {
-    @PrimaryGeneratedColumn()
-    id: number;
+	@PrimaryGeneratedColumn()
+	id: number;
 
-    @Column('varchar', { length: 250 })
-    key: string;
+	@Column('varchar', { length: 250 })
+	key: string;
 
-    @Column('varchar', { length: 500 })
-    value: string;
+	@Column('varchar', { length: 500 })
+	value: string;
 }

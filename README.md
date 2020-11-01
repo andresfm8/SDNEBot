@@ -36,10 +36,13 @@ The **SDNE Bot** or **Syndey** is a Discord Bot built for the **Software Design 
       2. Replace `<CLIENT_ID>` in the following URL with your **Client ID** above and navigate to the URL
       `https://discordapp.com/api/oauth2/authorize?client_id=<CLIENT_ID_HERE>&permissions=8&scope=bot`
       1. Invite your bot to the testing server made in step 4.1
+   6. Under `Server Settings > Roles`, add the roles that can be found in `env.example.ts`
 
 ### Setting up the Bot
 1. Duplicate the `env.example.ts` to `env.ts`
-2. Edit `env.ts` & add your **Bot Token** from the developers portal to **botToken** value
+2. Edit `env.ts`
+   1. Add your **Bot Token** from the developers portal to **botToken** value
+   2. After the roles are added to your server, make sure to copy the id and then pase to the respective role entry under `env.ts`
 3. Once ready, run the following command and you're ready! `> npm start`
 
 Install steps adapted from the following locations
