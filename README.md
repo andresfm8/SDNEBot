@@ -44,6 +44,7 @@ The **SDNE Bot** or **Syndey** is a Discord Bot built for the **Software Design 
    1. Add your **Bot Token** from the developers portal to **botToken** value
    2. After the roles are added to your server, make sure to copy the id and then pase to the respective role entry under `env.ts`
 3. Once ready, run the following command and you're ready! `> npm start`
+4. Create a new channel that will be used for the **assign roles** channel and then run the following command `!assignInfo` (this will place the assign embed in the channel)
 
 Install steps adapted from the following locations
 - https://pythondiscord.com/pages/contributing/setting-test-server-and-bot-account/

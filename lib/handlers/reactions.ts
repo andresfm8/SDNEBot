@@ -1,113 +1,162 @@
-import * as Discord from 'discord.js'
+/**
+ *
+ * TimmyRB
+ * November 1, 2020
+ * The following file is used for handling reactions
+ *
+ */
 
-import * as db from '../../database'
-import { bot } from '../../bot'
-import { help, hasAttachment } from '../funcs'
-import { helpPage, setHelpPage, roles } from '../globVars'
+// Import the required items
+import * as Discord from 'discord.js';
+import * as db from '../../database';
+import { bot } from '../../bot';
+import { help, hasAttachment } from '../funcs';
+import { helpPage, setHelpPage, roles } from '../globVars';
 
-export async function handleReactionAdd(rct: Discord.MessageReaction, usr: Discord.User | Discord.PartialUser) {
+/**
+ *
+ * The following function is used to handle when a message receives a reaction
+ *
+ * @param reaction: is the reaction for the respective message
+ * @param user: is the user that triggered the reaction
+ */
+export async function handleReactionAdd(reaction: Discord.MessageReaction, user: Discord.User | Discord.PartialUser) {
+	// Try the following and catch any errors that occur
 	try {
+		// Await the reaction
+		await reaction.message.fetch().catch(err => console.error(err));
 
-		await rct.message.fetch().catch(err => console.error(err))
-
-		usr.fetch().then(async user => {
+		// Fetch the user for processing
+		user.fetch().then(async user => {
 			// Disallow actions for Bot
-			if (user.bot)
-				return
+			if(user.bot) {
+				// Return to stop further processing
+				return;
+			}
 
 			// Disallow Reacting for Muted Users
 			db.getUser(user.id, user.username, (userData: Object) => {
-				if (userData['muted'] === true)
-					rct.users.remove(user)
-			})
+				// Check to see if the user is muted
+				if(userData['muted'] === true) {
+					// Remove the reaction since the user is muted
+					reaction.users.remove(user);
+				}
+			});
 
-			let assignId = await db.getConfig('assign').catch(err => console.error(err))
+			// Create the required variables
+			let assign_role_message_id = await db.getConfig('assign').catch(err => console.error(err));
+			let assign_years = ['📗', '📘', '📙', '🧾'];
+			let assign_campus = ['1️⃣', '2️⃣'];
+			var member: Discord.GuildMember;
+			var newUser: Boolean = false;
+			let emoji_name: string = reaction.emoji.name;
+			let users: Discord.Collection<string, Discord.User> = await reaction.users.fetch();
 
-			let years = ['📗', '📘', '📙', '🧾']
-			let campus = ['1️⃣', '2️⃣']
+			// Check to see if the channel the reaction was made in is a text channel
+			if(reaction.message.channel.type === 'text') {
+				// Update the member value
+				member = reaction.message.guild.member(user);
+			}
 
-			if (rct.message.channel.type === 'text')
-				var member: Discord.GuildMember = rct.message.guild.member(user)
+			// Check to see if the reaction was a question mark and the bot was one of the user who reacted
+			if(emoji_name === '❓' && reaction.users.cache.array().includes(bot.user)) {
+				// Remove the reaction from the message and display the help page
+				reaction.remove();
+				setHelpPage(help(member, 0, reaction.message.channel));
+			}else if(emoji_name === '➡️' && reaction.message.author === bot.user) {
+				// Remove the users reaction from the message and switch to the next help page
+				reaction.users.remove(user);
+				setHelpPage(help(member, helpPage + 1, undefined, reaction.message));
+			}else if(emoji_name === '⬅️' && reaction.message.author === bot.user) {
+				// Remove the users reaction from the message and switch to the previous help page
+				reaction.users.remove(user);
+				setHelpPage(help(member, helpPage - 1, undefined, reaction.message));
+			}else if(emoji_name === '🗑️' && users.array().includes(bot.user)) {
+				// Delete the message
+				reaction.message.delete();
+			}else if(assign_years.includes(emoji_name) && reaction.message.id === assign_role_message_id) {
+				// Iterate over each of the reactions to the assign message
+				reaction.message.reactions.cache.forEach((reaction) => {
+					// Iterate over each of the user that reacted to the message
+					reaction.users.fetch().then(reaction_users => {
+						// Check to see if the user reacted with a wrong reaction emoji
+						if(reaction.emoji.name !== emoji_name && reaction_users.array().includes(user) && !assign_campus.includes(reaction.emoji.name)) {
+							// Remove the users reaction from the message
+							reaction.users.remove(user).catch(error => console.error(error));
+						}
+					});
+				});
 
-			let eName: string = rct.emoji.name
-			let users: Discord.Collection<string, Discord.User> = await rct.users.fetch()
+				// Check to see if the member has the unassigned role
+				if(member.roles.cache.array().includes(roles['👻'])) {
+					// specify that the user is new
+					newUser = true;
+				}
 
-			if (eName === '❓' && rct.users.cache.array().includes(bot.user)) {
+				// Remove all of the year roles from the user and also the unassigned role
+				member.roles.remove([roles['📗'], roles['📘'], roles['📙'], roles['🧾'], roles['👻']], 'Removed Conflicting year roles').then(async () => {
+					// Add the desired year role to the member
+					member.roles.add(roles[emoji_name], `Added ${roles[emoji_name].name}`).catch(err => console.error(err));
 
-				rct.remove()
-				setHelpPage(help(member, 0, rct.message.channel))
+					// Check to see if the user is new
+					if(newUser) {
+						// Grab the general channel
+						var general_channel = await db.getConfig('generalChannel');
 
-			} else if (eName === '➡️' && rct.message.author === bot.user) {
-
-				rct.users.remove(user)
-				setHelpPage(help(member, helpPage + 1, undefined, rct.message))
-
-			} else if (eName === '⬅️' && rct.message.author === bot.user) {
-
-				rct.users.remove(user)
-				setHelpPage(help(member, helpPage - 1, undefined, rct.message))
-
-			} else if (eName === '🗑️' && users.array().includes(bot.user)) {
-
-				rct.message.delete()
-
-			} else if (years.includes(eName) && rct.message.id === assignId) {
-
-				rct.message.reactions.cache.forEach(function (r) {
-					r.users.fetch().then(usersR => {
-						if (r.emoji.name != eName && usersR.array().includes(user) && !campus.includes(r.emoji.name))
-							r.users.remove(user).catch(err => console.error(err))
-					})
-				})
-
-				if (member.roles.cache.array().includes(roles['👻']))
-					var newUser = true
-
-				member.roles.remove([roles['📗'], roles['📘'], roles['📙'], roles['🧾'], roles['👻']], 'Removed Conflicting Years').then(() => {
-					member.roles.add(roles[eName], `Added ${roles[eName].name}`).catch(err => console.error(err))
-
-					if (newUser) {
-						db.getConfig('generalChannel').then((id) => {
-							let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(id)
-							channel.send(`**Welcome <@${member.user.id}> !**\nFeel free to introduce yourself in <#754165320624898129> !`)
-						})
+						// Check to make sure that the general_channel isn't undefined
+						if(general_channel !== undefined) {
+							// Grab the channel instance and then post the welcome message
+							let channel = <Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel>bot.guilds.cache.first().channels.cache.get(general_channel);
+							channel.send(`**Welcome <@${member.user.id}> !**\nFeel free to introduce yourself in <#754165320624898129> !`);
+						}
 					}
-				}).catch(err => console.error(err))
+				}).catch(error => console.error(error));
+			}else if(assign_campus.includes(emoji_name) && reaction.message.id === assign_role_message_id) {
+				// Iterate over each of the reactions to the assign message
+				reaction.message.reactions.cache.forEach(function (reaction) {
+					// Iterate over each of the user that reacted to the message
+					reaction.users.fetch().then(reaction_users => {
+						// Check to see if the user reacted with a wrong reaction emoji
+						if(reaction.emoji.name != emoji_name && reaction_users.array().includes(user) && !assign_years.includes(reaction.emoji.name)) {
+							// Remove the users reaction from the message
+							reaction.users.remove(user).catch(err => console.error(err));
+						}
+					});
+				});
 
-			} else if (campus.includes(eName) && rct.message.id === assignId) {
+				// Remove all of the campus roles from the user
+				member.roles.remove([roles['1️⃣'], roles['2️⃣']], 'Removed Conflicting assign_campuses').then(() => {
+					// Add the respective campus role for the user
+					member.roles.add(roles[emoji_name], `Added ${roles[emoji_name].name}`).catch(error => console.error(error));
+				}).catch(error => console.error(error));
+			}else if(emoji_name === '📌') {
+				// Check to see if the message has an attachment
+				if(hasAttachment(reaction.message)) {
+					// Send the user the message along with the attachment
+					user.send(`**<@${reaction.message.author.id}> sent:**\n${reaction.message.content}`, reaction.message.attachments.array()).then(dm => dm.react('🗑️'));
+				}else if(reaction.message.embeds.length > 0) {
+					// Send the user the message along with the embeds
+					user.send(`**<@${reaction.message.author.id}> sent:**\n${reaction.message.content}`, reaction.message.embeds).then(dm => dm.react('🗑️'));
+				}else{
+					// Send the user the message along with the content
+					user.send(`**<@${reaction.message.author.id}> sent:**\n${reaction.message.content}`).then(dm => dm.react('🗑️'));
+				}
+			}else{
+				// Grab the author of the reaction
+				let author: Discord.User = reaction.message.author
 
-				rct.message.reactions.cache.forEach(function (r) {
-					r.users.fetch().then(usersR => {
-						if (r.emoji.name != eName && usersR.array().includes(user) && !years.includes(r.emoji.name))
-							r.users.remove(user).catch(err => console.error(err))
-					})
-				})
-
-				member.roles.remove([roles['1️⃣'], roles['2️⃣']], 'Removed Conflicting Campuses').then(() => {
-					member.roles.add(roles[eName], `Added ${roles[eName].name}`).catch(err => console.error(err))
-				}).catch(err => console.error(err))
-
-			} else if (eName === '👎') {
-				// Do Nothing
-			} else if (eName === '📌') {
-				if (hasAttachment(rct.message))
-					user.send(`**<@${rct.message.author.id}> sent:**\n${rct.message.content}`, rct.message.attachments.array()).then(dm => dm.react('🗑️'))
-				else if (rct.message.embeds.length > 0)
-					user.send(`**<@${rct.message.author.id}> sent:**\n${rct.message.content}`, rct.message.embeds).then(dm => dm.react('🗑️'))
-				else
-					user.send(`**<@${rct.message.author.id}> sent:**\n${rct.message.content}`).then(dm => dm.react('🗑️'))
-			} else {
-
-				let author: Discord.User = rct.message.author
-
-				if (author.bot || author === user)
+				// Check to see if the author was a bot or the user that triggered the reaction
+				if (author.bot || author === user) {
+					// Return to stop further processing
 					return
+				}
 
-				db.updateUser(author.id, author.username, undefined, undefined, undefined, 1, true)
-
+				// Update the users contribution points
+				db.updateUser(author.id, author.username, undefined, undefined, undefined, 1, true);
 			}
 		})
-	} catch (exception) {
-		console.error(exception)
+	}catch(exception) {
+		// Log the error to the console
+		console.error(exception);
 	}
 }
