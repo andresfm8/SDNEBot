@@ -15,13 +15,28 @@ export interface Role {
 	rid: string;
 	name: string;
 	full_name?: string;
-}
+};
+
+// Define the Prof interface
+export interface Prof {
+	id: number,
+	name: string,
+	role: string,
+	score?: number,
+	retake?: string,
+	level?: number,
+	highlightReview?: string
+};
 
 // Define the following env varibales
 export const botToken: string = '';
 export const dbFile: string = 'database.db';
-export const generalChannel: string = '772259249966809121';
-export const introductionChannel: string = '772578649765052416';
+export const generalChannel: string = '';
+export const introductionChannel: string = '';
+export const editChannel: string = '';
+export const deletedChannel: string = '';
+export const yearChannels: Array<string> = ['', '', ''];
+export const commandPrefix: string = '!';
 export const localRoles = [
 	{
 		rid: '',

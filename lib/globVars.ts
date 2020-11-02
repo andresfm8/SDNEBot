@@ -14,6 +14,10 @@ export var roles: Object = {};
 export var helpPage: number = 0;
 export var generalChannel: string = env['generalChannel'];
 export var introductionChannel: string = env['introductionChannel'];
+export var editChannel: string = env['editChannel'];
+export var deletedChannel: string = env['deletedChannel'];
+export var yearChannels: Array<string> = env['yearChannels'];
+export var commandPrefix: string = env['commandPrefix'];
 
 // Export a function that will help updating the help page variable
 export function setHelpPage(num: number) {

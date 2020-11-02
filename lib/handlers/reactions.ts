@@ -24,7 +24,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 	// Try the following and catch any errors that occur
 	try {
 		// Await the reaction
-		await reaction.message.fetch().catch(error => console.error(error));
+		await reaction.message.fetch().catch(console.error);
 
 		// Fetch the user for processing
 		user.fetch().then(async user => {
@@ -44,7 +44,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 			});
 
 			// Create the required variables
-			let assign_role_message_id = await db.getConfig('assign').catch(error => console.error(error));
+			let assign_role_message_id = await db.getConfig('assign').catch(console.error);
 			let assign_years = ['📗', '📘', '📙', '🧾'];
 			let assign_campus = ['1️⃣', '2️⃣'];
 			var member: Discord.GuildMember;
@@ -82,7 +82,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 						// Check to see if the user reacted with a wrong reaction emoji
 						if(reaction.emoji.name !== emoji_name && reaction_users.array().includes(user) && !assign_campus.includes(reaction.emoji.name)) {
 							// Remove the users reaction from the message
-							reaction.users.remove(user).catch(error => console.error(error));
+							reaction.users.remove(user).catch(console.error);
 						}
 					});
 				});
@@ -96,7 +96,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 				// Remove all of the year roles from the user and also the unassigned role
 				member.roles.remove([roles['📗'], roles['📘'], roles['📙'], roles['🧾'], roles['👻']], 'Removed conflicting year roles').then(async () => {
 					// Add the desired year role to the member
-					member.roles.add(roles[emoji_name], `Added ${roles[emoji_name].name}`).catch(err => console.error(err));
+					member.roles.add(roles[emoji_name], `Added ${roles[emoji_name].name}`).catch(console.error);
 
 					// Check to see if the user is new
 					if(new_user) {
@@ -117,7 +117,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 							channel.send(`**Welcome <@${member.user.id}>!**\nFeel free to introduce yourself in <#${introductionChannel}>!`);
 						}
 					}
-				}).catch(error => console.error(error));
+				}).catch(console.error);
 			}else if(assign_campus.includes(emoji_name) && reaction.message.id === assign_role_message_id) {
 				// Iterate over each of the reactions to the assign message
 				reaction.message.reactions.cache.forEach(function (reaction) {
@@ -126,7 +126,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 						// Check to see if the user reacted with a wrong reaction emoji
 						if(reaction.emoji.name != emoji_name && reaction_users.array().includes(user) && !assign_years.includes(reaction.emoji.name)) {
 							// Remove the users reaction from the message
-							reaction.users.remove(user).catch(err => console.error(err));
+							reaction.users.remove(user).catch(console.error);
 						}
 					});
 				});
@@ -134,8 +134,8 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 				// Remove all of the campus roles from the user
 				member.roles.remove([roles['1️⃣'], roles['2️⃣']], 'Removed Conflicting assign_campuses').then(() => {
 					// Add the respective campus role for the user
-					member.roles.add(roles[emoji_name], `Added ${roles[emoji_name].name}`).catch(error => console.error(error));
-				}).catch(error => console.error(error));
+					member.roles.add(roles[emoji_name], `Added ${roles[emoji_name].name}`).catch(console.error);
+				}).catch(console.error);
 			}else if(emoji_name === '📌') {
 				// Check to see if the message has an attachment
 				if(hasAttachment(reaction.message)) {

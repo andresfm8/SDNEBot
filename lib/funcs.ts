@@ -90,7 +90,7 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 	};
 
 	// Determine the current page of tips to display
-	let toDisplay = tips.slice((page - 1) * 3);
+	let toDisplay = tips.slice(((page - 1) * tips_per_page), (page * tips_per_page));
 
 	// Push the items to display to the embeded fields array
 	toDisplay.forEach(item => {
