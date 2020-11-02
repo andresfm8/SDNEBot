@@ -4,6 +4,10 @@
  * November 1, 2020
  * The following file is used for handling reactions
  *
+ * Updates
+ * -------
+ * November 1, 2020 -- N3rdP1um23 -- Updated execution of commands and cleaned up file
+ *
  */
 
 // Import the required items
