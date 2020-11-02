@@ -64,7 +64,7 @@ export function displayAssignInfo(message: Discord.Message) {
     message.delete().catch(console.error);
 
     // Send the embed to the channel
-    message.channel.send(embed).then((embed_message: Discord.Message) => {
+    message.channel.send(embed).then(async (embed_message: Discord.Message) => {
         // Add the respective reactions to the message
         embed_message.react('📗').then(() => {
             // React with the next respective command
@@ -84,7 +84,7 @@ export function displayAssignInfo(message: Discord.Message) {
         });
 
         // Update the config value that will hold the assign roles id
-        db.updateConfig('assign', message.id);
+        await db.updateConfig('assign', embed_message.id);
     });
 
     // Return to stop further processing
