@@ -49,22 +49,22 @@ export function displayInfo(message: Discord.Message) {
                     fields: [
                         {
                             name: 'Warns',
-                            value: `\`\`\`${userData['warns']}\`\`\``,
+                            value: `\`\`\`${ userData['warns'] }\`\`\``,
                             inline: true
                         },
                         {
                             name: 'Kicks',
-                            value: `\`\`\`${userData['kicks']}\`\`\``,
+                            value: `\`\`\`${ userData['kicks'] }\`\`\``,
                             inline: true
                         },
                         {
                             name: 'Muted',
-                            value: `\`\`\`${userData['muted']}\`\`\``,
+                            value: `\`\`\`${ userData['muted'] }\`\`\``,
                             inline: true
                         },
                         {
                             name: 'Contribution Points',
-                            value: `\`\`\`${userData['cbp']}\`\`\``,
+                            value: `\`\`\`${ Math.round(userData['cbp']) }\`\`\``,
                             inline: true
                         }
                     ]

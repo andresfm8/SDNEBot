@@ -6,7 +6,7 @@
  *
  * Updates
  * -------
- * November 1, 2020 -- N3rdP1um23 -- Updated execution of commands and cleaned up file
+ * November 1, 2020 -- N3rdP1um23 -- Updated execution of commands and cleaned up file, updated the cbp to be a random number between 1-500
  *
  */
 
@@ -44,7 +44,7 @@ export function handleMessage(message: Discord.Message) {
 	});
 
 	// Update the users contribution points
-	db.updateUser(message.author.id, message.author.username, undefined, undefined, undefined, ((message.content.length / 50) || 0), true)
+	db.updateUser(message.author.id, message.author.username, undefined, undefined, undefined, ((message.content.length / (Math.random() * (500 - 1) + 1)) || 0), true)
 
 	// Define the respective variables
 	var raw_message = message.content.trim().toLowerCase();
