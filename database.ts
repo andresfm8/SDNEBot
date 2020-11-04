@@ -1,128 +1,130 @@
-// Imports
-import * as Mongo from "mongodb"
-import { Int32, Long, Timestamp, Db } from "mongodb"
-import { dbPass } from "./env"
+/**
+ *
+ * N3rdP1um23
+ * October 31, 2020
+ * The following file is used to interface with the database
+ *
+ * Updates
+ * -------
+ * November 1, 2020 -- N3rdP1um23 -- Removed getRoles function as it wasn't referenced anywhere
+ *
+ */
 
-// Instances
-const client = new Mongo.MongoClient(`mongodb://dbUser:${dbPass}@sdnebot-shard-00-00-sh7xu.gcp.mongodb.net:27017,sdnebot-shard-00-01-sh7xu.gcp.mongodb.net:27017,sdnebot-shard-00-02-sh7xu.gcp.mongodb.net:27017/test?ssl=true&replicaSet=SDNEBot-shard-0&authSource=admin&retryWrites=true&w=majority`, { useUnifiedTopology: true, useNewUrlParser: true })
+// Import the requried files
+import { getConnection, getRepository } from 'typeorm';
+import { Config } from './lib/Entities/Config';
+import { User } from './lib/Entities/User';
+import * as moment from 'moment';
 
-var db: Db
+// The following function is used to return a selected user
+export async function getUser(uid: string, name: string, callback: Function) {
+	// Query and store the user find in a variable
+	var user = await getConnection().getRepository(User).createQueryBuilder('user').where('uid = :uid', { uid: uid }).getOne();
 
-client.connect((err, dbc) => {
-    if (err) throw err
+	// Check to see if the user was found
+	if(user !== undefined) {
+		// Execute the callback function
+		callback(user);
+	}else{
+		// Create the user object
+		let userData = {
+			uid: uid,
+			name: name,
+			lastUpdated: moment().unix().toString(),
+			warns: 0,
+			kicks: 0,
+			muted: false,
+			cbp: 0,
+		};
 
-    db = dbc.db('SDNEBot')
-})
+		// Insert the new user into the database
+		await getConnection().getRepository(User).createQueryBuilder().insert().into(User).values(userData).execute();
 
-/** Returns user from Database */
-export function getUser(uid: string, name: string, callback: Function) {
-    db.collection('users').find({ uid: uid }).toArray((err, res) => {
-        if (err) throw err
-
-        if (res[0] !== undefined)
-            callback(res[0])
-        else {
-            let userData = {}
-            userData['uid'] = uid
-            userData['name'] = name
-            userData['lastUpdated'] = Timestamp.fromNumber(Date.now())
-            userData['warns'] = 0
-            userData['kicks'] = 0
-            userData['muted'] = false
-            userData['cbp'] = 0
-            db.collection('users').insertOne(userData, (err, res) => {
-                if (err) throw err
-            })
-            callback(userData)
-        }
-    })
+		// Execute the callback function
+		callback(userData);
+	}
 }
 
-export function getRoles(callback: Function) {
-    db.collection('roles').find().toArray((err, res: Array<Object>) => {
-        if (err) throw err
-        callback(res)
-    })
-}
+// The following function is used to take in a key and then return the respective config value
+export async function getConfig(key: string) {
+	// Query and grab the respective config key
+	var config = await getConnection().getRepository(Config).createQueryBuilder('config').where('key = :key', { key: key }).getOne();
 
-export async function getConfig(key: string): Promise<string> {
-    var promise: Promise<string> = new Promise((resolve, reject) => {
-        db.collection('config').find({ key: key }).toArray((err, res) => {
-            if (err) reject(err)
+	// Check to see if the config key is found
+	if(config !== undefined) {
+		// Return the respective config key
+		return config.value;
+	}
 
-            if (res[0] !== undefined)
-                resolve(res[0]['value'])
-            else
-                reject(new Error('Key not found'))
-        })
-    })
-
-    return promise
+	// Return the config value
+	return;
 }
 
 /** Update or Insert a user in the Database */
-export function updateUser(uid: string, name: string, warns?: Int32, kicks?: Int32, muted?: boolean, cbp?: Int32, addTo?: boolean | false) {
-    getUser(uid, name, (user: Object) => {
-        let t: Timestamp = Timestamp.fromNumber(Date.now())
-        let userObj = {}
+export function updateUser(uid: string, name: string, warns?: number, kicks?: number, muted?: boolean, cbp?: number, addTo?: boolean | false) {
+	// Grab the respective user from the database
+	getUser(uid, name, async (user: Object) => {
+		// Create the required variables
+		let t: string = moment().unix().toString();
+		let userObj = {};
 
-        userObj['uid'] = uid
-        userObj['name'] = name
-        userObj['lastUpdated'] = t
+		// Start processing the update for the user items
+		userObj['uid'] = uid;
+		userObj['name'] = name;
+		userObj['lastUpdated'] = t;
 
-        if (user != undefined) {
-            // User Exists
+		// Check to see if the user exists
+		if(user !== undefined) {
+			// Check to see if there are any warns for the user
+			if(warns !== undefined) {
+				// Update the users warns count
+				userObj['warns'] = warns + ((addTo) ? user['warns'] : 0);
+			}
 
-            if (warns != undefined)
-                userObj['warns'] = warns + (addTo ? user['warns'] : 0)
+			// Check to see if there are any kicks for the user
+			if(kicks !== undefined) {
+				// Update the users warns count
+				userObj['kicks'] = kicks + ((addTo) ? user['kicks'] : 0);
+			}
 
-            if (kicks != undefined)
-                userObj['kicks'] = kicks + (addTo ? user['kicks'] : 0)
+			// Check to see if the user is muted
+			if(muted !== undefined) {
+				// Update the users warns count
+				userObj['muted'] = muted;
+			}
 
-            if (muted != undefined)
-                userObj['muted'] = muted
+			// Check to see if there are any contribution points for the user
+			if(cbp !== undefined) {
+				// Update the users contribution points count
+				userObj['cbp'] = cbp + ((addTo) ? user['cbp'] : 0);
+			}
 
-            if (cbp != undefined)
-                userObj['cbp'] = cbp + (addTo ? user['cbp'] : 0)
+			// Update the user
+			await getConnection().getRepository(User).createQueryBuilder().update(User).set(userObj).where('uid = :uid', { uid: uid }).execute();
+		}else{
+			// Update the users parameters for a first time entry
+			userObj['warns'] = ((warns !== undefined) ? warns : 0);
+			userObj['kicks'] = ((kicks !== undefined) ? kicks : 0);
+			userObj['muted'] = ((muted !== undefined) ? muted : false);
+			userObj['cbp'] = ((cbp !== undefined) ? cbp : 0);
 
-            db.collection('users').updateOne({ uid: uid }, { $set: userObj }, (err, res) => {
-                if (err) throw err
-            })
-        } else {
-            // User doesn't exist
-
-            userObj['warns'] = (warns != undefined ? warns : 0)
-            userObj['kicks'] = (kicks != undefined ? kicks : 0)
-            userObj['muted'] = (muted != undefined ? muted : false)
-            userObj['cbp'] = (cbp != undefined ? cbp : 0)
-
-            db.collection('users').insertOne(userObj, (err, res) => {
-                if (err) throw err
-            })
-        }
-    })
+			// Insert the user
+			await getConnection().getRepository(User).createQueryBuilder().insert().into(User).values(userObj).execute();
+		}
+	})
 }
 
 /** Update Bot Config Settings */
-export function updateConfig(key: string, value: string) {
-    let obj = {
-        key: key,
-        value: value
-    }
+export async function updateConfig(key: string, value: string) {
+	// Check to see if the config key doesn't exist already
+	if(await getConfig(key) === undefined) {
+		// Create the new key and store it into the database
+		await getConnection().getRepository(Config).createQueryBuilder().insert().into(Config).values({ key: key, value: value }).execute();
 
-    db.collection('config').find({ key: key }).toArray((err, res) => {
-        if (err) throw err
+		// Return the stop further processing
+		return;
+	}
 
-        if (res[0] !== undefined) {
-            // Config Exists
-            db.collection('config').updateOne({ key: key }, { $set: obj }, (err, res) => {
-                if (err) throw err
-            })
-        } else {
-            // Config doesn't exist
-            db.collection('config').insertOne(obj, (err, res) => {
-                if (err) throw err
-            })
-        }
-    })
+	// Update the respective config item value based on the passed in key
+	await getConnection().getRepository(Config).createQueryBuilder().update(Config).set({ value: value }).where('key = :key', { key: key }).execute();
 }

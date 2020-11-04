@@ -102,3 +102,6 @@ public
 
 # Hide Environment Vars
 env.ts
+
+.vs/
+database.db
