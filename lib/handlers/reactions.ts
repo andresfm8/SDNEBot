@@ -55,7 +55,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 			// Check to see if the channel the reaction was made in is a text channel
 			if(reaction.message.channel.type === 'text') {
 				// Update the member value
-				member = reaction.message.guild.member(user);
+				member = reaction.message.guild.members.cache.get(user.id);
 			}
 
 			// Check to see if the reaction was a question mark and the bot was one of the user who reacted
