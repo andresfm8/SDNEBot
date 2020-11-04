@@ -44,6 +44,12 @@ export function cleanupMessages(message: Discord.Message, args) {
 	// Delete the message from the user
 	message.delete().catch(console.error);
 
+	if (message.channel.type === "dm" || message.channel.type === "news"){
+		// React with a question mark as the operation isn't corrent and then return to stop further processing
+		message.react('❓');
+		return;
+	}
+
 	// Perform a bulk deletion in the channel that the original message was sent
 	message.channel.bulkDelete(amount, true)
 	.then((deleted) => {
