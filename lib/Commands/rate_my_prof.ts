@@ -4,6 +4,10 @@
  * November 1, 2020
  * The following file is used to handle the rate my prof command
  *
+ * Updates
+ * -------
+ * November 16, 2020 -- N3rdP1um23 -- Updated handling for grabbing the individual prof page and parsing the data
+ *
  */
 
 // Import the requried items
@@ -11,6 +15,7 @@ import * as Discord from 'discord.js';
 import { parse } from 'node-html-parser';
 import Axios from 'axios';
 import { Prof } from '../../env';
+import { Any } from 'typeorm';
 
 /**
  *
@@ -158,24 +163,33 @@ function singleProf(findId: number, message: Discord.Message) {
             // Check to see if there was an error with the request
 			if(result.status === 301 || result.status === 404) {
                 // Reply with an error message and then return to stop further processing
-				message.reply('I had trouble finding that professor. Please double check your spelling!');
+				message.reply('I had trouble finding that professor. Please double check your spelling! - error 1');
 				return;
             }
 
             // Parse the response and then initialize the professor instance
 			let html = parse(result.data);
-			let p: Prof = { id: 0, name: '', score: 0, role: '', retake: '', level: 0, highlightReview: '' };
+            let p: Prof = { id: 0, name: '', score: 0, role: '', retake: '', level: 0, highlightReview: '' };
+
+            // Parse the page for class names for respective sections
+            let page_classes = [].concat(...[...html.querySelectorAll('*')].map(element => [...element.classNames]));
+            let name_class = page_classes.find(value => value.includes('NameTitle__Name'));
+            let role_class = page_classes.find(value => value.includes('NameTitle__Title'));
+            let score_class = page_classes.find(value => value.includes('RatingValue__Numerator'));
+            let retake_level_class = page_classes.find(value => value.includes('FeedbackItem__FeedbackNumber'));
+            let helpful_rating_class = page_classes.find(value => value.includes('HelpfulRating__StyledRating'));
+            let helpful_rating_comment_class = [].concat(...[...html.querySelector('.' + helpful_rating_class).childNodes].map(element => [...element.classNames])).find(value => value.includes('Comments__StyledComments'));
 
             // Initialize the stardard field values for the professor
 			p.id = findId;
-			p.name = `${html.querySelector('.jeLOXk').firstChild.text} ${html.querySelector('.glXOHH').firstChild.text}`;
-			p.role = `${html.querySelector('.hfQOpA').firstChild.childNodes[1].text}`;
-			p.score = parseFloat(html.querySelector('.gxuTRq').text);
+			p.name = `${html.querySelector('.' + name_class).firstChild.text}`;
+			p.role = `${html.querySelector('.' + role_class).firstChild.childNodes[1].text}`;
+			p.score = parseFloat(html.querySelector('.' + score_class).text);
 
             // Try and parse a retake value
 			try {
                 // Set the retake value from the parsed value
-				p.retake = `${html.querySelector('.jCDePN').firstChild.childNodes[0].text}`;
+				p.retake = `${html.querySelectorAll('.' + retake_level_class)[0].text}`;
 			}catch{
                 // Set the retake value to a defauly value
 				p.retake = '0%';
@@ -184,7 +198,7 @@ function singleProf(findId: number, message: Discord.Message) {
             // Try and parse a level
 			try {
                 // Set the level to the parsed value
-				p.level = parseFloat(html.querySelector('.jCDePN').childNodes[1].childNodes[0].text);
+				p.level = parseFloat(html.querySelectorAll('.' + retake_level_class)[1].text);
 			}catch{
                 // Set the level to a default of 0
 				p.level = 0;
@@ -200,7 +214,7 @@ function singleProf(findId: number, message: Discord.Message) {
             // Try and parse a highlighted rating
 			try {
                 // Set the rating to the highlighted rating
-				p.highlightReview = `${html.querySelector('.dvnRbr').text}`;
+				p.highlightReview = `${html.querySelector('.' + helpful_rating_comment_class).text}`;
 			}catch{
                 // Handle setting a standard review
 				p.highlightReview = `Bummer, ${p.name} doesn't have any featured ratings...`;
@@ -243,7 +257,7 @@ function singleProf(findId: number, message: Discord.Message) {
 			message.channel.send(profEmbed);
 		}).catch(error => {
             // Reply with an error message, log the error, and return to stop further processing
-			message.reply('I had trouble finding that professor. Please double check your spelling!');
+			message.reply('I had trouble finding that professor. Please double check your spelling! - error 2');
 			console.error(error);
 			return;
 		})
