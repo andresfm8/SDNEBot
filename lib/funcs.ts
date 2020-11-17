@@ -4,6 +4,10 @@
  * November 1, 2020
  * The following file is used for function initialization for the application
  *
+ * Updates
+ * -------
+ * November 17, 2020 -- N3rdP1um23 -- Added version command to the help menu
+ *
  */
 
 // Import the required items
@@ -61,6 +65,7 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 		tips.push({ 'name': 'Mute User(s)', 'value': '```!mute @non_admin_user[]```' });
 		tips.push({ 'name': 'Unmute User(s)', 'value': '```!unmute @non_admin_user[]```' });
 		tips.push({ 'name': 'Warn User(s)', 'value': '```!warn #rule_num @non_admin_user[]```' });
+		tips.push({ 'name': 'Display bot (repo) version', 'value': '```!version```' });
 	}
 
 	// Define the max amount of pages  based on the amount of tips
