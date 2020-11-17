@@ -60,13 +60,6 @@ export function handleMessage(message: Discord.Message) {
 			return;
 		}
 
-		// Check to see if the user is executing the version command
-		if(command === 'version') {
-			// Call the help command and return to stop further processing
-			commands['version'].displayVersionDetails(message);
-			return;
-		}
-
 		// Check to see if the user is executing the rmp command
 		if(command === 'rmp') {
 			// Call the help command and return to stop further processing
@@ -166,6 +159,20 @@ export function handleMessage(message: Discord.Message) {
 			if(command === 'warn') {
 				// Call the help command and return to stop further processing
 				commands['warn'].warnUsers(message, args, color);
+				return;
+			}
+
+			// Check to see if the user is executing the version command
+			if(command === 'version') {
+				// Call the help command and return to stop further processing
+				commands['version'].displayVersionDetails(message);
+				return;
+			}
+
+			// Check to see if the user is executing the update command
+			if(command === 'update') {
+				// Call the help command and return to stop further processing
+				commands['update'].updateBot(message);
 				return;
 			}
 		}
