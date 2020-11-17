@@ -20,3 +20,4 @@ export * as restart from './restart';
 export * as intro_info from './intro_info';
 export * as mute_unmute from './mute_unmute';
 export * as warn from './warn';
+export * as version from './version';
