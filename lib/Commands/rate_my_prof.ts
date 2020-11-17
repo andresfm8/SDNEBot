@@ -260,7 +260,7 @@ function singleProf(findId: number, message: Discord.Message) {
 			message.reply('I had trouble finding that professor. Please double check your spelling! - error 2');
 			console.error(error);
 			return;
-		})
+		});
 	}catch(exception) {
 		// Log the exception
 		console.error(exception);
