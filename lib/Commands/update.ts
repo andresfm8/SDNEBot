@@ -19,27 +19,27 @@ const exec = promisify(require('child_process').exec);
  *
  */
 export async function updateBot(message: Discord.Message) {
-    // React to the message in acknowledgement of the update
-    message.react('👌').then(async () => {
-        // Update the repo from master
-        exec('git pull origin master').then((output) => {
-            // Finalize the output
-            let status = output.stdout.replace('\n', '');
+	// React to the message in acknowledgement of the update
+	message.react('👌').then(async () => {
+		// Update the repo from master
+		exec('git pull origin master').then((output) => {
+			// Finalize the output
+			let status = output.stdout.replace('\n', '');
 
-            // Send the output message to the channel
-            message.channel.send(status).then(() => {
-                // Check to see if the bot isn't up to date
-                if(status !== 'Already up to date.') {
-		    // Rerender the TS files
-		    exec('tsc bot.ts').then((output) => {
-                        // Kill bot process
-                        process.exit(0);
-		    });
-                }
-            });
-        });
+			// Send the output message to the channel
+			message.channel.send(status).then(() => {
+				// Check to see if the bot isn't up to date
+				if(status !== 'Already up to date.') {
+					// Rerender the TS files
+					exec('tsc bot.ts').then(() => {
+						// Kill bot process
+						process.exit(0);
+					});
+				}
+			});
+		});
 	});
 
-    // Return to stop further processing
-    return;
+	// Return to stop further processing
+	return;
 }
