@@ -30,8 +30,11 @@ export async function updateBot(message: Discord.Message) {
             message.channel.send(status).then(() => {
                 // Check to see if the bot isn't up to date
                 if(status !== 'Already up to date.') {
-                    // Kill bot process
-                    process.exit(0);
+		    // Rerender the TS files
+		    exec('tsc bot.ts').then((output) => {
+                        // Kill bot process
+                        process.exit(0);
+		    });
                 }
             });
         });
