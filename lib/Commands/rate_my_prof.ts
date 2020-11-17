@@ -12,10 +12,9 @@
 
 // Import the requried items
 import * as Discord from 'discord.js';
-import { parse } from 'node-html-parser';
+import { HTMLElement, parse } from 'node-html-parser';
 import Axios from 'axios';
 import { Prof } from '../../env';
-import { Any } from 'typeorm';
 
 /**
  *
@@ -163,7 +162,7 @@ function singleProf(findId: number, message: Discord.Message) {
 			// Check to see if there was an error with the request
 			if(result.status === 301 || result.status === 404) {
 				// Reply with an error message and then return to stop further processing
-				message.reply('I had trouble finding that professor. Please double check your spelling! - error 1');
+				message.reply('I had trouble finding that professor. Please double check your spelling!');
 				return;
 			}
 
@@ -178,7 +177,7 @@ function singleProf(findId: number, message: Discord.Message) {
 			let score_class = page_classes.find(value => value.includes('RatingValue__Numerator'));
 			let retake_level_class = page_classes.find(value => value.includes('FeedbackItem__FeedbackNumber'));
 			let helpful_rating_class = page_classes.find(value => value.includes('HelpfulRating__StyledRating'));
-			let helpful_rating_comment_class = [].concat(...[...html.querySelector('.' + helpful_rating_class).childNodes].map(element => [...element.classNames])).find(value => value.includes('Comments__StyledComments'));
+			let helpful_rating_comment_class = [].concat(...[...html.querySelector('.' + helpful_rating_class).childNodes].map((element: HTMLElement) => [...element.classNames])).find(value => value.includes('Comments__StyledComments'));
 
 			// Initialize the stardard field values for the professor
 			p.id = findId;
@@ -257,7 +256,7 @@ function singleProf(findId: number, message: Discord.Message) {
 			message.channel.send(profEmbed);
 		}).catch(error => {
 			// Reply with an error message, log the error, and return to stop further processing
-			message.reply('I had trouble finding that professor. Please double check your spelling! - error 2');
+			message.reply('I had trouble finding that professor. Please double check your spelling!');
 			console.error(error);
 			return;
 		});
