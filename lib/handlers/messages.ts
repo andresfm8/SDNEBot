@@ -7,6 +7,8 @@
  * Updates
  * -------
  * November 1, 2020 -- N3rdP1um23 -- Updated execution of commands and cleaned up file, updated the cbp to be a random number between 1-500
+ * November 17, 2020 -- N3rdP1um23 -- Added version & update commands
+ * November 18, 2020 -- N3rdP1um23 -- Added archive command
  *
  */
 
@@ -175,11 +177,18 @@ export function handleMessage(message: Discord.Message) {
 				commands['update'].updateBot(message);
 				return;
 			}
+
+			// Check to see if the user is executing the archive command
+			if(command === 'archive') {
+				// Call the help command and return to stop further processing
+				commands['archive'].archiveChannel(message, args);
+				return;
+			}
 		}
 	}
 
 	// Check to see if someone flipped a table or used the table flip command
-	if(raw_message.startsWith('(╯°□°）╯︵ ┻━┻') || raw_message.startsWith('/tableflip')) {
+	if(raw_message.includes('(╯°□°）╯︵ ┻━┻') || raw_message.includes('/tableflip')) {
 		// Unflip the table
 		message.channel.send('┬─┬ ノ( ゜-゜ノ)');
 	}

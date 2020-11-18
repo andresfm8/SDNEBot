@@ -7,6 +7,7 @@
  * Updates
  * -------
  * November 17, 2020 -- N3rdP1um23 -- Added version & update command to the help menu
+ * November 18, 2020 -- N3rdP1um23 -- Added archive command to the help menu
  *
  */
 
@@ -45,7 +46,7 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 	tips.push({ 'name': 'Create Channel', 'value': '```!make channelName```'});
 	tips.push({ 'name': 'User(s\') Info', 'value': '```!info @user[]```' });
 	tips.push({ 'name': 'View RateMyProfessor info', 'value': '```!rmp profName```'});
-	tips.push({ 'name': 'Get days until an event (mainly holiday)', 'value': '```!daysUntil event name```'});
+	tips.push({ 'name': 'Get days until an event (mainly holidays)', 'value': '```!daysUntil event_name[]```'});
 
 	// Check to see if the member has the permission to manage roles
 	if(member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)) {
@@ -67,6 +68,7 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 		tips.push({ 'name': 'Warn User(s)', 'value': '```!warn #rule_num @non_admin_user[]```' });
 		tips.push({ 'name': 'Display bot (repo) version', 'value': '```!version```' });
 		tips.push({ 'name': 'Update bot (repo) version', 'value': '```!update```' });
+		tips.push({ 'name': 'Archive Channel', 'value': '```!archive [recreated=false]```' });
 	}
 
 	// Define the max amount of pages  based on the amount of tips
