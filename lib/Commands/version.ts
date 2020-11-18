@@ -23,10 +23,11 @@ export async function displayVersionDetails(message: Discord.Message) {
 	var repo_url = await exec('git config --get remote.origin.url');
 	let current_commit_hash = await exec('git rev-parse HEAD');
 	var repo_status = await exec('git status -uno');
-	var remote_hash = await exec('git log -n 1 origin/master');
+	var remote_hash = await exec('git remote update');
 	let last_update = await exec('git log -1 --format=%cd ');
 
 	// Format the respective variables
+	remote_hash = await exec('git log -n 1 origin/master');
 	repo_url = repo_url.stdout.replace('.git', '').replace('\n', '');
 	repo_status = repo_status.stdout.split('\n')[1];
 	remote_hash = remote_hash.stdout.split('\n')[0].replace('commit', '').trim();

@@ -4,6 +4,10 @@
  * November 17, 2020
  * The following file is used to handle updating the bot
  *
+ * Updates
+ * -------
+ * November 18, 2020 -- N3rdP1um23 -- Updated bot to remove tsc update and replaced it with an npm update/install
+ *
  */
 
 // Import the requried items
@@ -30,8 +34,8 @@ export async function updateBot(message: Discord.Message) {
 			message.channel.send(status).then(() => {
 				// Check to see if the bot isn't up to date
 				if(status !== 'Already up to date.') {
-					// Rerender the TS files
-					exec('tsc bot.ts').then(() => {
+					// Update the npm files
+					exec('npm i').then(() => {
 						// Kill bot process
 						process.exit(0);
 					});
