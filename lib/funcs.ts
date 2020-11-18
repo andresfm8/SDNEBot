@@ -68,7 +68,7 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 		tips.push({ 'name': 'Warn User(s)', 'value': '```!warn #rule_num @non_admin_user[]```' });
 		tips.push({ 'name': 'Display bot (repo) version', 'value': '```!version```' });
 		tips.push({ 'name': 'Update bot (repo) version', 'value': '```!update```' });
-		tips.push({ 'name': 'Archive Channel', 'value': '```!archive [recreated=false]```' });
+		tips.push({ 'name': 'Archive Channel', 'value': '```!archive [clone=false]```' });
 	}
 
 	// Define the max amount of pages  based on the amount of tips

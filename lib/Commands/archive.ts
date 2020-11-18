@@ -64,7 +64,7 @@ export function archiveChannel(message: Discord.Message, args) {
 							id: mod.id,
 							allow: ['VIEW_CHANNEL'],
 						}
-					], 'Hide everyone access from the category and only allow Admins and Mods to view.');
+					], 'Hide everyone\'s access from this category and only allow Admins and Mods to view.');
 
 					// Update the archived_category_channel variable
 					archive_category_channel = channel;
@@ -86,14 +86,37 @@ export function archiveChannel(message: Discord.Message, args) {
 			// Send an error message that the channel is already archived
 			message.channel.send('This channel is already archived! (╯°□°）╯︵ ┻━┻');
 		}else{
-			// Check to see if the channel should be recreated
+			// Create a variable that will hold the clonsed channel
+			var cloned_channel;
+
+			// Check to see if the channel should be cloned
 			if(args[0] === 'true') {
 				// Clone the channel
-				await current_channel.clone();
+				cloned_channel = await current_channel.clone();
 			}
 
+			// Formulate the archive embed
+			let archive_embed = {
+				embed: {
+					title: `Channel Archived`,
+					description: `This channel has now been archived.`,
+					color: 4886754,
+					timestamp: new Date(),
+					fields: [
+						{
+							name: "Was the channel cloned?",
+							value: `${(args[0] === 'true') ? `\`Yes - New Channel\` <#${cloned_channel.id}>` : '\`\`\`No\`\`\`'}`,
+						},
+						{
+							name: "Archived by",
+							value: `<@${message.member.user.id}>`,
+						}
+					]
+				}
+			};
+
 			// Handle updateing the respective channel
-			current_channel.setParent(archive_category_channel.id, { lockPermissions: true }).then(() => message.channel.send('This channel has now been archived!')).catch(console.error);
+			current_channel.setParent(archive_category_channel.id, { lockPermissions: true }).then(() => message.channel.send(archive_embed)).catch(console.error);
 		}
 	});
 
