@@ -2,13 +2,12 @@
  *
  * N3rdP1um23
  * November 18, 2020
- * The following file is used to handle archiving the respective channel
+ * The following file is used to handle respective channel commands
  *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
-import { AnyARecord } from 'dns';
 import * as db from '../../database';
 
 /**
@@ -16,10 +15,10 @@ import * as db from '../../database';
  * The following function is used to handle archiving the respective channel
  *
  * @param message: is the message to handle
- * @param args: is the array of events
+ * @param args: is the array of arguments
  *
  */
-export function archiveChannel(message: Discord.Message, args) {
+export function archive(message: Discord.Message, args) {
     // Check to see if no parameters were passed
 	if(args.length === 1 && (args[0] !== 'true' && args[0] !== 'false')) {
 		// React with a question mark as the user hasn't entered a valid option and then return to stop further processing
@@ -88,9 +87,10 @@ export function archiveChannel(message: Discord.Message, args) {
 		}else{
 			// Create a variable that will hold the clonsed channel
 			var cloned_channel;
+			let clone_channel = args.shift();
 
 			// Check to see if the channel should be cloned
-			if(args[0] === 'true') {
+			if(clone_channel === 'true') {
 				// Clone the channel
 				cloned_channel = await current_channel.clone();
 			}
@@ -105,11 +105,15 @@ export function archiveChannel(message: Discord.Message, args) {
 					fields: [
 						{
 							name: "Was the channel cloned?",
-							value: `${(args[0] === 'true') ? `\`Yes - New Channel\` <#${cloned_channel.id}>` : '\`\`\`No\`\`\`'}`,
+							value: `${(clone_channel === 'true') ? `\`Yes - New Channel\` <#${cloned_channel.id}>` : '\`\`\`No\`\`\`'}`,
 						},
 						{
 							name: "Archived by",
 							value: `<@${message.member.user.id}>`,
+						},
+						{
+							name: "Reason",
+							value: `\`\`\`${(args.length > 0) ? args.join(' ') : 'N/A'}\`\`\``,
 						}
 					]
 				}
@@ -119,6 +123,58 @@ export function archiveChannel(message: Discord.Message, args) {
 			current_channel.setParent(archive_category_channel.id, { lockPermissions: true }).then(() => message.channel.send(archive_embed)).catch(console.error);
 		}
 	});
+
+    // Return to stop further processing
+    return;
+}
+
+/**
+ *
+ * The following function is used to handle cloning the respective channel
+ *
+ * @param message: is the message to handle
+ * @param message: is the passed parameters
+ *
+ */
+export async function clone(message: Discord.Message, args) {
+	// Grab the current channel in question
+	var current_channel = message.guild.channels.cache.find(channel => channel.id === message.channel.id);
+	// Create a variable that will hold the clonsed channel
+	var cloned_channel;
+
+	// Clone the channel
+	cloned_channel = await current_channel.clone();
+
+	// Formulate the clone embed
+	let clone_embed = {
+		embed: {
+			title: `Channel Clonned`,
+			description: `This channel has now been cloned.`,
+			color: 4886754,
+			timestamp: new Date(),
+			fields: [
+				{
+					name: "Cloned from",
+					value: `<#${cloned_channel.id}>`,
+				},
+				{
+					name: "Cloned to",
+					value: `<#${cloned_channel.id}>`,
+				},
+				{
+					name: "Cloned by",
+					value: `<@${message.member.user.id}>`,
+				},
+				{
+					name: "Reason",
+					value: `\`\`\`${(args.length > 0) ? args.join(' ') : 'N/A'}\`\`\``,
+				}
+			]
+		}
+	};
+
+	// Send the notive to the channel
+	message.channel.send(clone_embed);
 
     // Return to stop further processing
     return;

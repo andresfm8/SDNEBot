@@ -178,10 +178,21 @@ export function handleMessage(message: Discord.Message) {
 				return;
 			}
 
-			// Check to see if the user is executing the archive command
-			if(command === 'archive') {
-				// Call the help command and return to stop further processing
-				commands['archive'].archiveChannel(message, args);
+			// Check to see if the user is executing the channel command
+			if(command === 'channel') {
+				// Create a variable that will hold the action value
+				let action = args.shift();
+
+				// Check to see if the action argument is valid
+				if(['archive', 'clone'].includes(action)) {
+					// Execute the respective action
+					commands['channel'][action](message, args);
+				}else{
+					// Send an error message
+					message.channel.send('Oops... Missing channel action to execute.');
+				}
+
+				// Return to stop further processing
 				return;
 			}
 		}
