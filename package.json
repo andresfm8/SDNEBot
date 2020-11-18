@@ -11,14 +11,14 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.20.0",
-    "discord.js": "^12.2.0",
+    "discord.js": "^12.4.1",
     "moment": "^2.29.1",
-    "node-html-parser": "^1.2.20",
+    "node-html-parser": "^1.4.9",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.0",
-    "typeorm": "^0.2.28"
+    "typeorm": "^0.2.29"
   },
   "devDependencies": {
-    "@types/node": "^14.14.6"
+    "@types/node": "^14.14.8"
   }
 }
