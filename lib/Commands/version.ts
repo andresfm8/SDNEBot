@@ -27,7 +27,7 @@ export async function displayVersionDetails(message: Discord.Message) {
 	let last_update = await exec('git log -1 --format=%cd ');
 
 	// Format the respective variables
-	remote_hash = await exec('git log 1 origin/master');
+	remote_hash = await exec('git log -n 1 origin/master');
 	repo_url = repo_url.stdout.replace('.git', '').replace('\n', '');
 	repo_status = repo_status.stdout.split('\n')[1];
 	remote_hash = remote_hash.stdout.split('\n')[0].replace('commit', '').trim();
