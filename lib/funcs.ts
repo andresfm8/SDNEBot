@@ -7,7 +7,7 @@
  * Updates
  * -------
  * November 17, 2020 -- N3rdP1um23 -- Added version & update command to the help menu
- * November 18, 2020 -- N3rdP1um23 -- Added archive command to the help menu
+ * November 18, 2020 -- N3rdP1um23 -- Added channel commands to the help menu
  *
  */
 
@@ -70,6 +70,7 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 		tips.push({ 'name': 'Update bot (repo) version', 'value': '```!update```' });
 		tips.push({ 'name': 'Archive Channel', 'value': '```!channel archive [clone=false]```' });
 		tips.push({ 'name': 'Clone Channel', 'value': '```!channel clone [clone=false]```' });
+		tips.push({ 'name': 'Clone Channel', 'value': '```!channel remove```' });
 	}
 
 	// Define the max amount of pages  based on the amount of tips

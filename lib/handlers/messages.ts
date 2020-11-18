@@ -8,7 +8,7 @@
  * -------
  * November 1, 2020 -- N3rdP1um23 -- Updated execution of commands and cleaned up file, updated the cbp to be a random number between 1-500
  * November 17, 2020 -- N3rdP1um23 -- Added version & update commands
- * November 18, 2020 -- N3rdP1um23 -- Added archive command
+ * November 18, 2020 -- N3rdP1um23 -- Added channel commands
  *
  */
 
@@ -184,12 +184,12 @@ export function handleMessage(message: Discord.Message) {
 				let action = args.shift();
 
 				// Check to see if the action argument is valid
-				if(['archive', 'clone'].includes(action)) {
+				if(['archive', 'clone', 'remove'].includes(action)) {
 					// Execute the respective action
 					commands['channel'][action](message, args);
 				}else{
 					// Send an error message
-					message.channel.send('Oops... Missing channel action to execute.');
+					message.channel.send('Oops... Missing/wrong channel action to execute.');
 				}
 
 				// Return to stop further processing

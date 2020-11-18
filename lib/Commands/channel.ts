@@ -139,6 +139,7 @@ export function archive(message: Discord.Message, args) {
 export async function clone(message: Discord.Message, args) {
 	// Grab the current channel in question
 	var current_channel = message.guild.channels.cache.find(channel => channel.id === message.channel.id);
+
 	// Create a variable that will hold the clonsed channel
 	var cloned_channel;
 
@@ -175,6 +176,41 @@ export async function clone(message: Discord.Message, args) {
 
 	// Send the notive to the channel
 	message.channel.send(clone_embed);
+
+    // Return to stop further processing
+    return;
+}
+
+/**
+ *
+ * The following function is used to handle removing the respective channel
+ *
+ * @param message: is the message to handle
+ * @param message: is the passed parameters
+ *
+ */
+export async function remove(message: Discord.Message, args) {
+	// Grab the current channel in question
+	var current_channel = message.guild.channels.cache.find(channel => channel.id === message.channel.id);
+
+	// Confirm with the user that they want to actually remove the channel
+	message.reply('The bot will now remove this channel.\nConfirm with `yes` or deny with `no`.');
+
+	// Await for a reply - must be send from the OG user, only accept one message, and await fro 30s
+	message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 30000}).then(async response => {
+		// first (and, in this case, only) message of the collection
+		if(response.first().content.toLowerCase() === 'yes') {
+			// Response with a message and then remove the channel
+			message.reply('Removing channel...');
+			await current_channel.delete();
+		}else{
+			// Reply with a failed message
+			message.reply('Aborted channel removal.');
+		}
+	}).catch(() => {
+		// Reply with a failed message
+		message.reply('Aborted channel removal.');
+	});
 
     // Return to stop further processing
     return;
