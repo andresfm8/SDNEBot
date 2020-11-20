@@ -6,7 +6,7 @@
  *
  * Updates
  * -------
- * November 20, 2020 -- N3rdP1um23 -- 
+ * November 20, 2020 -- N3rdP1um23 -- Added more info to the user command
  *
  */
 
@@ -25,12 +25,12 @@ const status_emoji = {
 
 /**
  *
- * The following function is used to handle displaying the help menu
+ * The following function is used to handle displaying info about a user
  *
  * @param message: is the message to handle
  *
  */
-export function displayInfo(message: Discord.Message) {
+export function displayUserInfo(message: Discord.Message) {
     // Check to see if the user didn't mention anyone in the message
     if(message.mentions.users.first() === undefined) {
         // React with a with a question mark and the return to stop further processing

@@ -44,7 +44,7 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 
 	// Append additional tips
 	tips.push({ 'name': 'Create Channel', 'value': '```!make channelName```'});
-	tips.push({ 'name': 'User(s\') Info', 'value': '```!info @user[]```' });
+	tips.push({ 'name': 'User(s\') Info', 'value': '```!userinfo @user[]```' });
 	tips.push({ 'name': 'View RateMyProfessor info', 'value': '```!rmp profName```'});
 	tips.push({ 'name': 'Get days until an event (mainly holidays)', 'value': '```!daysUntil event_name[]```'});
 

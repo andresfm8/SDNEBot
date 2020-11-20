@@ -69,10 +69,10 @@ export function handleMessage(message: Discord.Message) {
 			return;
 		}
 
-		// Check to see if the user is executing the info command
-		if(command === 'info') {
+		// Check to see if the user is executing the userinfo command
+		if(command === 'userinfo') {
 			// Call the help command and return to stop further processing
-			commands['info'].displayInfo(message);
+			commands['info'].displayUserInfo(message);
 			return;
 		}
 
