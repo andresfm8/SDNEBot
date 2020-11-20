@@ -4,12 +4,24 @@
  * November 1, 2020
  * The following file is used to handle displaying user info
  *
+ * Updates
+ * -------
+ * November 20, 2020 -- N3rdP1um23 -- 
+ *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
 import * as moment from 'moment';
 import * as db from '../../database';
+
+// Define global helper arrays
+const status_emoji = {
+    online: ':green_circle:',
+    idle: ':orange_circle:',
+    offline: ':white_circle:',
+    dnd: ':red_circle:',
+};
 
 /**
  *
@@ -28,8 +40,9 @@ export function displayInfo(message: Discord.Message) {
 
     // Iterate over each of the mentions and then formulate the embed
     message.mentions.users.array().forEach(mention => {
-        // Grab the users nickname
-        let nick = (message.guild.member(mention).nickname ? message.guild.member(mention).nickname : mention.username);
+        // Grab the member and their nickname
+        let member = message.guild.member(mention);
+        let nick = (member.nickname ? member.nickname : mention.username);
 
         // Query the database for the respective user
         db.getUser(mention.id, mention.username, (userData: Object) => {
@@ -39,37 +52,50 @@ export function displayInfo(message: Discord.Message) {
             // Initialize the embed object
             let embed = {
                 embed: {
-                    title: `${nick}'s Information`,
-                    description: `Get a user's information`,
-                    color: 3553599,
-                    timestamp: moment.unix(Number(time)).toDate(),
+                    title: `${status_emoji[member.user.presence.status]} ${nick}'s Information`,
+					url: `${member.user.avatarURL().toString()}`,
+                    description: `Chilling in ${member.user.presence.status.replace('dnd', 'do not disturb')} status!`,
+                    color: ((member.roles.cache.size > 0) ? member.roles.cache.first().color : 3066993),
                     footer: {
-                        text: 'Last Updated'
+                        text: `User Id: ${member.user.id} | Last Updated: ${ moment.unix(Number(time)).format('MMM DD, YYYY @ HH:mm') }`
                     },
                     fields: [
                         {
-                            name: 'Warns',
+                            name: '**Warns**',
                             value: `\`\`\`${ userData['warns'] }\`\`\``,
                             inline: true
                         },
                         {
-                            name: 'Kicks',
+                            name: '**Kicks**',
                             value: `\`\`\`${ userData['kicks'] }\`\`\``,
                             inline: true
                         },
                         {
-                            name: 'Muted',
+                            name: '**Muted**',
                             value: `\`\`\`${ userData['muted'] }\`\`\``,
                             inline: true
                         },
                         {
-                            name: 'Contribution Points',
+                            name: '**Contribution Points**',
                             value: `\`\`\`${ Math.round(userData['cbp']) }\`\`\``,
+                        },
+                        {
+                            name: '**Joined Discord on**',
+                            value: `${ moment(member.user.createdTimestamp).format('MMM DD, YYYY @ HH:mm') }\n(${ moment(member.user.createdTimestamp).fromNow() })`,
                             inline: true
+                        },
+                        {
+                            name: '**Joined this server on**',
+                            value: `${ moment(member.joinedTimestamp).format('MMM DD, YYYY @ HH:mm') }\n(${ moment(member.joinedTimestamp).fromNow() })`,
+                            inline: true
+                        },
+                        {
+                            name: '**Roles**',
+                            value: member.roles.cache.filter(role => role.name !== '@' + 'everyone').map(role => `<@&${role.id}>`).join(', ')
                         }
                     ]
                 }
-            }
+            };
 
             // Check to see if the user has an avatar
             if(mention.avatarURL() !== null) {
