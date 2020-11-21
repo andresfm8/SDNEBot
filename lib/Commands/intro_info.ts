@@ -4,10 +4,15 @@
  * November 1, 2020
  * The following file is used to handle displaying the introduction information
  *
+ * Updates
+ * -------
+ * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
+ *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
+import { diary } from '../funcs';
 
 /**
  *
@@ -34,7 +39,7 @@ export function displayIntroInformation(message: Discord.Message) {
 
     // Send the embed to the channel and then delete the message
     message.channel.send(introEmbed);
-    message.delete().catch(console.error);
+    message.delete().catch(error => diary('sad', message.guild, error));
 
     // Return to stop further processing
     return;

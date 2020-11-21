@@ -4,11 +4,16 @@
  * November 1, 2020
  * The following file is used to handle displaying the assign info embed
  *
+ * Updates
+ * -------
+ * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
+ *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
 import * as db from '../../database';
+import { diary } from '../funcs';
 
 /**
  *
@@ -61,7 +66,7 @@ export function displayAssignInfo(message: Discord.Message) {
     };
 
     // Delete the users message
-    message.delete().catch(console.error);
+    message.delete().catch(error => diary('sad', message.guild, error));
 
     // Send the embed to the channel
     message.channel.send(embed).then(async (embed_message: Discord.Message) => {

@@ -8,12 +8,12 @@
  * -------
  * October 31, 2020 -- N3rdP1um23 -- Added new DB handling
  * November 01, 2020 -- N3rdP1um23 -- Updated the roles assignment and searching through Discord roles
+ * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
  *
  */
 
 // Import the required items
 import * as Discord from 'discord.js';
-import * as db from './database';
 import { botToken, dbFile, localRoles } from './env';
 import { roles } from './lib/globVars';
 import { handleReactionAdd } from './lib/handlers/reactions';
@@ -23,6 +23,7 @@ import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import { Config } from './lib/Entities/Config';
 import { User } from './lib/Entities/User';
+import { diary } from './lib/funcs';
 
 // Create the requried instances
 export const bot = new Discord.Client({ partials: Object.values(Discord.Constants.PartialTypes) })
@@ -41,7 +42,8 @@ createConnection({
 	// Bot startup
 	bot.on('ready', () => {
 		// Log who the bot was signed in as and set the presence of the bot
-		console.log(`Logged in as ${bot.user.tag}`);
+		console.log(`Bot started successfully!`);
+		diary('happy', bot.guilds.cache.first(), {status: `Signed in as ${bot.user.tag}`});
 		bot.user.setPresence({ activity: { type: 'WATCHING', name: 'for !help' }, status: 'online' });
 
 		// Iterate over each role from the roles object and handle them accordingly
@@ -75,4 +77,4 @@ createConnection({
 
 	// Listen for Message Edits
 	// bot.on('messageUpdate', (oldMessage, newMessage) => handleMessageEdit(oldMessage, newMessage));
-}).catch(error => console.log(error));
+}).catch(console.error);

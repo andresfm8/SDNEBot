@@ -4,12 +4,17 @@
  * November 1, 2020
  * The following file is used to handle warning mentioned users
  *
+ * Updates
+ * -------
+ * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
+ *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
 import { Permissions } from 'discord.js';
 import * as db from '../../database';
+import { diary } from '../funcs';
 import { rules } from '../globVars';
 
 /**
@@ -110,7 +115,7 @@ export function warnUsers(message: Discord.Message, args, color) {
 	// Check to see if the warned list isn't empty
 	if (warned !== '') {
 		// Send the embed to the channel and then delete the original message
-		message.channel.send(warned, embed).then(() => message.delete().catch(console.error));
+		message.channel.send(warned, embed).then(() => message.delete().catch(error => diary('sad', message.guild, error)));
 	}else{
 		// React to the request with a question mark as the command either wasn't complete or something else happened
 		message.react('❓');

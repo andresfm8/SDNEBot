@@ -8,6 +8,7 @@
  * -------
  * November 17, 2020 -- N3rdP1um23 -- Added version & update command to the help menu
  * November 18, 2020 -- N3rdP1um23 -- Added channel commands to the help menu
+ * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
  *
  */
 
@@ -15,6 +16,19 @@
 import * as Discord from 'discord.js'
 import { Permissions } from 'discord.js'
 import * as db from '../database'
+import { NewChannel } from '../env';
+
+// Emotions object
+const emotions = {
+	sad: {
+		color: 3447003,
+		emoji: ':slight_frown:'
+	},
+	happy: {
+		color: 15105570,
+		emoji: ':smiley:'
+	},
+};
 
 /**
  *
@@ -158,4 +172,176 @@ export function hasAttachment(msg: Discord.Message | Discord.PartialMessage): bo
 export function hasURL(msg: Discord.Message | Discord.PartialMessage): boolean {
 	// Return if the message has a URL
 	return (msg.content.indexOf('https://') !== -1 || msg.content.indexOf('http://') !== -1);
+}
+
+/**
+ *
+ * The following function is used to handle writing to the bots diary
+ *
+ * @param emotion : is the emotion of the diary entry
+ * @param guild : is the Discord guild to handle
+ * @param diary_object? : is the diary object to handle
+ *
+ */
+export async function diary(emotion = 'sad', guild: Discord.Guild, diary_object?) {
+	// Create the required variables
+	var bot_category;
+	var bot_diary_channel;
+
+	// Check to see if there's a bot specific channel
+	await db.getConfig('bot_channel_id').then(async (result) => {
+		// Create the required variables
+		var channels = guild.channels.cache;
+		var category_channels = channels.filter(channel => channel.type === 'category');
+		var text_channels = channels.filter(channel => channel.type === 'text');
+		var existing_bot_category = category_channels.find(channel => channel.name.toLowerCase().includes('bot'));
+		var existing_bot_diary_channel = text_channels.find(channel => channel.name.toLowerCase().includes('diary'));
+
+		// Check to see if the channel id exists
+		if(result !== undefined) {
+			// Set the bot diary channel
+			bot_diary_channel = text_channels.find(channel => channel.id === result);
+		}
+
+		// Check to see if the channel doesn't exist
+		if(bot_diary_channel === undefined) {
+			// Check to see if the bot category doesn't exist
+			if(existing_bot_category === undefined) {
+				// Create and set the bot category instance
+				await createChannel(guild, {
+					title: '🤖 bot-stuff',
+					type: 'category',
+					topic: 'Bots Playpen',
+				}).then(async channel => {
+					// Update the bot_cateogry reference
+					bot_category = channel;
+
+					// Create the new bot diary channel
+					await createChannel(guild, {
+						title: 'diary',
+						type: 'text',
+						topic: 'Bots Diary',
+						parent: channel.id
+					}).then(async channel => {
+						// Update the bot diary channel reference
+						bot_diary_channel = channel;
+
+						// Store the bot diary channel id in the database
+						await db.updateConfig('bot_channel_id', channel.id);
+					});
+				});
+			}else{
+				// Update the bot category reference
+				bot_category = existing_bot_category;
+
+				// Check to make sure the diary channel exists
+				if(existing_bot_diary_channel === undefined || (existing_bot_diary_channel !== undefined && existing_bot_diary_channel.parentID !== bot_category.id)) {
+					// Create the new bot diary channel
+					await createChannel(guild, {
+						title: 'diary',
+						type: 'text',
+						topic: 'Bots Diary',
+						parent: bot_category.id
+					}).then(async channel => {
+						// Update the bot diary channel reference
+						bot_diary_channel = channel;
+
+						// Store the bot diary channel id in the database
+						await db.updateConfig('bot_channel_id', channel.id);
+					});
+				}
+			}
+		}else{
+			// Check to see if the bot category doesn't exist
+			if(existing_bot_category === undefined) {
+				// Create and set the bot category instance
+				await createChannel(guild, {
+					title: '🤖 bot-stuff',
+					type: 'category',
+					topic: 'Bots Playpen',
+				}).then(async channel => {
+					// Update the bot_cateogry reference
+					bot_category = channel;
+
+					// Update the parent of teh diary channel
+					bot_diary_channel.setParent(bot_category.id, { lockPermissions: true }).catch(console.error);
+				});
+			}else{
+				// Update the bot category reference
+				bot_category = existing_bot_category;
+
+				// Check to make sure the diary channel exists
+				if(bot_diary_channel.parentID !== bot_category.id) {
+					// Update the parent of teh diary channel
+					bot_diary_channel.setParent(bot_category.id, { lockPermissions: true }).catch(console.error);
+				}
+			}
+		}
+	});
+
+	// Create the diary embed
+	let embed = {
+		embed: {
+			title: `${ emotions[emotion].emoji } Diary Entry #${ Math.floor(Math.random() * Math.floor(9999999999)) }`,
+			description: `On this day...`,
+			color: emotions[emotion].color,
+			footer: {
+				text: "I just wanted to let you know..."
+			},
+			fields: [
+				{
+					name: "**I felt...**",
+					value: `${ emotions[emotion].emoji } ${ emotion.charAt(0).toUpperCase() + emotion.slice(1) }`
+				},
+				{
+					name: "**I did...**",
+					value: `\`\`\`${ (diary_object !== undefined) ? JSON.stringify(diary_object).substring(0, 1900).replace('`', '') : 'Nothing...' }\`\`\``
+				}
+			]
+		}
+	};
+
+	// Send the embed to the diary channel
+	bot_diary_channel.send(embed);
+}
+
+
+/**
+ *
+ * @param guild is the Discord guild instance to handle
+ * @param channel_properties is the object of new channel properties
+ */
+async function createChannel(guild, channel_properties: NewChannel) : Promise<Discord.TextChannel | Discord.CategoryChannel> {
+	// Create a variable that will hold the new channel instance
+	var new_channel;
+
+	// Create the bot diary channel
+	await guild.channels.create(channel_properties.title, {type: channel_properties.type, topic: channel_properties.topic, parent: channel_properties.parent}).then((channel) => {
+		// Grab the respective roles
+		const everyone = guild.roles.cache.find(role => role.name.toLowerCase() === "@" + "everyone");
+		const admin = guild.roles.cache.find(role => role.name.toLowerCase() === "admin");
+		const mod = guild.roles.cache.find(role => role.name.toLowerCase() === "moderator");
+
+		// Update the permissions for the channel
+		channel.overwritePermissions([
+			{
+				id: everyone.id,
+				deny: ['VIEW_CHANNEL'],
+			},
+			{
+				id: admin.id,
+				allow: ['VIEW_CHANNEL'],
+			},
+			{
+				id: mod.id,
+				allow: ['VIEW_CHANNEL'],
+			}
+		], 'Hide everyone\'s access from this category and only allow Admins and Mods to view.');
+
+		// Set the new channel variable
+		new_channel = channel;
+	});
+
+	// Return the new channel
+	return new_channel;
 }
