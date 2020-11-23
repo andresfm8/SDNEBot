@@ -7,6 +7,7 @@
  * Updates
  * -------
  * November 16, 2020 -- N3rdP1um23 -- Updated handling for grabbing the individual prof page and parsing the data
+ * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
  *
  */
 
@@ -15,6 +16,7 @@ import * as Discord from 'discord.js';
 import { HTMLElement, parse } from 'node-html-parser';
 import Axios from 'axios';
 import { Prof } from '../../env';
+import { diary } from '../funcs';
 
 /**
  *
@@ -82,7 +84,6 @@ export function rateProf(message: Discord.Message, args) {
 					let id = Number(url.slice(21))
 					let name = l.querySelector('.main').text
 					let role = l.querySelector('.sub').text
-					// console.log(`${name}\n${role}\n${url}\n${id}`)
 
 					// Push the found professor to the foundProfs array
 					foundProfs.push({ id: id, name: name, role: role })
@@ -134,7 +135,7 @@ export function rateProf(message: Discord.Message, args) {
 		}catch(exception) {
 			// Reply with an error, log the exception, and then return to stop further processing
 			message.reply('I had trouble finding that professor. Please double check your spelling!');
-			console.error(exception);
+			diary('sad', message.guild, exception);
 			return;
 		}
 	}else{
@@ -257,11 +258,11 @@ function singleProf(findId: number, message: Discord.Message) {
 		}).catch(error => {
 			// Reply with an error message, log the error, and return to stop further processing
 			message.reply('I had trouble finding that professor. Please double check your spelling!');
-			console.error(error);
+			diary('sad', message.guild, error);
 			return;
 		});
 	}catch(exception) {
 		// Log the exception
-		console.error(exception);
+		diary('sad', message.guild, exception);
 	}
 }

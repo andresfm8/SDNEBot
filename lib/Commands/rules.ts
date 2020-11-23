@@ -4,11 +4,16 @@
  * November 1, 2020
  * The following file is used to handle displaying the rules of the server
  *
+ * Updates
+ * -------
+ * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
+ *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
 import { Permissions } from 'discord.js';
+import { diary } from '../funcs';
 import { rules } from '../globVars';
 
 /**
@@ -45,7 +50,7 @@ export function displayRules(message: Discord.Message) {
     });
 
     // Attempt to delete the original message from the user
-    message.delete().catch(console.error);
+    message.delete().catch(error => diary('sad', message.guild, error));
 
     // Check to see if the message should be sent to the users DMs
     if(dm) {

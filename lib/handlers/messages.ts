@@ -9,6 +9,8 @@
  * November 1, 2020 -- N3rdP1um23 -- Updated execution of commands and cleaned up file, updated the cbp to be a random number between 1-500
  * November 17, 2020 -- N3rdP1um23 -- Added version & update commands
  * November 18, 2020 -- N3rdP1um23 -- Added channel commands
+ * November 20, 2020 -- N3rdP1um23 -- Added admin commands & new log handling
+ * November 23, 2020 -- N3rdP1um23 -- Added serverinfo command
  *
  */
 
@@ -18,7 +20,7 @@ import * as db from '../../database';
 import { Permissions } from 'discord.js';
 import { bot } from '../../bot';
 import { commandPrefix, editChannel, deletedChannel } from '../globVars';
-import { hasAttachment, hasURL } from '../funcs';
+import { diary, hasAttachment, hasURL } from '../funcs';
 import * as commands from '../Commands';
 
 /**
@@ -73,6 +75,13 @@ export function handleMessage(message: Discord.Message) {
 		if(command === 'userinfo') {
 			// Call the help command and return to stop further processing
 			commands['info'].displayUserInfo(message);
+			return;
+		}
+
+		// Check to see if the user is executing the serberinfo command
+		if(command === 'serverinfo') {
+			// Call the help command and return to stop further processing
+			commands['info'].displayServerInfo(message);
 			return;
 		}
 
@@ -218,9 +227,9 @@ export function handleMessage(message: Discord.Message) {
 			// Append the next reaction to the message
 			message.react('👎').then(() => {
 				// Append the next reaction to the message
-				message.react('📌').catch(console.error);
-			}).catch(console.error);
-		}).catch(console.error);
+				message.react('📌').catch(error => diary('sad', message.guild, error));
+			}).catch(error => diary('sad', message.guild, error));
+		}).catch(error => diary('sad', message.guild, error));
 	}
 }
 
@@ -237,7 +246,7 @@ export async function handleMessageDelete(message: Discord.Message | Discord.Par
 		// Check to see if the message is partial
 		if(message.partial) {
 			// Await for the full message
-			await message.fetch().catch(console.error);
+			await message.fetch().catch(error => diary('sad', message.guild, error));
 		}
 
 		// Check to see if the message author is a bot, a ssystem message, or in a DM/news channel
@@ -274,10 +283,10 @@ export async function handleMessageDelete(message: Discord.Message | Discord.Par
 		let content = message.content.replace(/`/g, '');
 
 		// Send the deleted message to the deleted messages channel
-		channel.send(`**${nick}'s message in <#${message.channel.id}> was deleted:**\`\`\`${content}\`\`\``).catch(console.error);
+		channel.send(`**${nick}'s message in <#${message.channel.id}> was deleted:**\`\`\`${content}\`\`\``).catch(error => diary('sad', message.guild, error));
 	}catch(exception) {
 		// Log the exception
-		console.error(exception);
+		diary('sad', message.guild, exception);
 	}
 }
 
@@ -341,9 +350,9 @@ export async function handleMessageEdit(oldMessage: Discord.Message | Discord.Pa
 		let newContent = newMessage.content.replace(/`/g, '');
 
 		// Send the edited message to the edited messages channel
-		channel.send(`**${nick} changed their message in <#${oldMessage.channel.id}> from:**\`\`\`${oldContent}\`\`\`**to:**\`\`\`${newContent}\`\`\``).catch(console.error);
+		channel.send(`**${nick} changed their message in <#${oldMessage.channel.id}> from:**\`\`\`${oldContent}\`\`\`**to:**\`\`\`${newContent}\`\`\``).catch(error => diary('sad', oldMessage.guild, error));
 	}catch(exception) {
 		// Log the exception
-		console.error(exception);
+		diary('sad', oldMessage.guild, exception);
 	}
 }

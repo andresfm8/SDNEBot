@@ -4,11 +4,16 @@
  * November 18, 2020
  * The following file is used to handle respective channel commands
  *
+ * Updates
+ * -------
+ * November 20, 2020 -- N3rdP1um23 -- Removed delete message from the channel & updated to use new logging method
+ *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
 import * as db from '../../database';
+import { diary } from '../funcs';
 
 /**
  *
@@ -120,7 +125,7 @@ export function archive(message: Discord.Message, args) {
 			};
 
 			// Handle updateing the respective channel
-			current_channel.setParent(archive_category_channel.id, { lockPermissions: true }).then(() => message.channel.send(archive_embed)).catch(console.error);
+			current_channel.setParent(archive_category_channel.id, { lockPermissions: true }).then(() => message.channel.send(archive_embed)).catch(error => diary('sad', message.guild, error));
 		}
 	});
 
@@ -200,8 +205,7 @@ export async function remove(message: Discord.Message, args) {
 	message.channel.awaitMessages(m => m.author.id == message.author.id, {max: 1, time: 30000}).then(async response => {
 		// first (and, in this case, only) message of the collection
 		if(response.first().content.toLowerCase() === 'yes') {
-			// Response with a message and then remove the channel
-			message.reply('Removing channel...');
+			// Remove the channel
 			await current_channel.delete();
 		}else{
 			// Reply with a failed message

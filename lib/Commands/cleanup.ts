@@ -4,10 +4,15 @@
  * November 1, 2020
  * The following file is used to handle cleaning up messages
  *
+ * Updates
+ * -------
+ * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
+ *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
+import { diary } from '../funcs';
 
 /**
  *
@@ -42,7 +47,7 @@ export function cleanupMessages(message: Discord.Message, args) {
 	}
 
 	// Delete the message from the user
-	message.delete().catch(console.error);
+	message.delete().catch(error => diary('sad', message.guild, error));
 
 	if (message.channel.type === "dm" || message.channel.type === "news"){
 		// React with a question mark as the operation isn't corrent and then return to stop further processing

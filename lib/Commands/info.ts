@@ -7,12 +7,14 @@
  * Updates
  * -------
  * November 20, 2020 -- N3rdP1um23 -- Added more info to the user command
+ * November 23, 2020 -- N3rdP1um23 -- Added serverinfo command
  *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
 import * as moment from 'moment';
+import { channel } from '.';
 import * as db from '../../database';
 
 // Define global helper arrays
@@ -109,6 +111,68 @@ export function displayUserInfo(message: Discord.Message) {
             message.channel.send(embed);
         });
     });
+
+    // Return to stop further processing
+    return;
+}
+
+/**
+ *
+ * The following function is used to handle displaying info about the server
+ *
+ * @param message: is the message to handle
+ *
+ */
+export async function displayServerInfo(message: Discord.Message) {
+    // Grab the guild
+    var guild = message.guild;
+
+    // Initialize the embed object
+    let embed = {
+        embed: {
+            title: `${ guild.name }`,
+            description: `This server was created on ${ moment(guild.createdTimestamp).format('MMM DD, YYYY @ HH:mm') }!`,
+            color: 3066993,
+            footer: {
+                text: ``
+            },
+            fields: [
+                {
+                    name: '**Members**',
+                    value: `**Users online:** ${ guild.members.cache.filter(member => member.presence.status === 'online').size }/${ guild.memberCount }\n**Humans:** ${ guild.members.cache.filter(member => !member.user.bot).size } - **Bots:** ${ guild.members.cache.filter(member => member.user.bot).size }`,
+                    inline: true
+                },
+                {
+                    name: '**Channels**',
+                    value: `**:speech_balloon: Text:** ${ guild.channels.cache.filter(channel => channel.type === 'text').size }\n**:loud_sound: Voice:** ${ guild.channels.cache.filter(channel => channel.type === 'voice').size }`,
+                    inline: true
+                },
+                {
+                    name: '**Utility**',
+                    value: `**Owner:** <@${ guild.owner.id }>\n**Voice Region:** ${ guild.region }\n**Server Id:** ${ guild.id }`,
+                },
+                {
+                    name: '**Misc**',
+                    value: `**AFK Channel:** ${ (guild.afkChannelID !== null) ? `<#${ guild.afkChannelID }>` : 'None' }\n**AFK Timeout:** ${ guild.afkTimeout/60 } mins\n**Custom Emojis:** ${ guild.emojis.cache.filter(emoji => emoji.deletable).size }\n**Roles:** ${ guild.roles.cache.size }`,
+                },
+                {
+                    name: '**Server Features**',
+                    value: (guild.features.length > 0) ? guild.features.forEach(feature => `:greenTick: ${ feature }`) : 'None',
+                },
+            ]
+        }
+    };
+
+    // Check to see if the server has an avatar
+    if(guild.iconURL() !== null) {
+        // Set the embed thumbnail to the servers avatar
+        embed['embed']['thumbnail'] = {
+            'url': guild.iconURL({ dynamic: true, size: 4096 })
+        };
+    }
+
+    // Send the embed message
+    message.channel.send(embed);
 
     // Return to stop further processing
     return;
