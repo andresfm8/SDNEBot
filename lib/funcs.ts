@@ -9,6 +9,7 @@
  * November 17, 2020 -- N3rdP1um23 -- Added version & update command to the help menu
  * November 18, 2020 -- N3rdP1um23 -- Added channel commands to the help menu
  * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
+ * November 23, 2020 -- N3rdP1um23 -- Added serverinfo command
  *
  */
 
@@ -59,6 +60,7 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 	// Append additional tips
 	tips.push({ 'name': 'Create Channel', 'value': '```!make channelName```'});
 	tips.push({ 'name': 'User(s\') Info', 'value': '```!userinfo @user[]```' });
+	tips.push({ 'name': 'Server Info', 'value': '```!serverinfo```' });
 	tips.push({ 'name': 'View RateMyProfessor info', 'value': '```!rmp profName```'});
 	tips.push({ 'name': 'Get days until an event (mainly holidays)', 'value': '```!daysUntil event_name[]```'});
 

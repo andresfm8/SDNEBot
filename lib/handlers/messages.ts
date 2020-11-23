@@ -10,6 +10,7 @@
  * November 17, 2020 -- N3rdP1um23 -- Added version & update commands
  * November 18, 2020 -- N3rdP1um23 -- Added channel commands
  * November 20, 2020 -- N3rdP1um23 -- Added admin commands & new log handling
+ * November 23, 2020 -- N3rdP1um23 -- Added serverinfo command
  *
  */
 
@@ -74,6 +75,13 @@ export function handleMessage(message: Discord.Message) {
 		if(command === 'userinfo') {
 			// Call the help command and return to stop further processing
 			commands['info'].displayUserInfo(message);
+			return;
+		}
+
+		// Check to see if the user is executing the serberinfo command
+		if(command === 'serverinfo') {
+			// Call the help command and return to stop further processing
+			commands['info'].displayServerInfo(message);
 			return;
 		}
 
