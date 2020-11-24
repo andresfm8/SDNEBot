@@ -4,6 +4,10 @@
  * November 17, 2020
  * The following file is used to handle displaying the current version of the bot
  *
+ * Updates
+ * -------
+ * November 23, 2020 -- N3rdP1um23 -- Updated command to execute repo update before grabbing data
+ *
  */
 
 // Import the requried items
@@ -20,14 +24,14 @@ const exec = promisify(require('child_process').exec);
  */
 export async function displayVersionDetails(message: Discord.Message) {
 	// Grab the required variables
+	await exec('git remote update');
 	var repo_url = await exec('git config --get remote.origin.url');
 	let current_commit_hash = await exec('git rev-parse HEAD');
-	var remote_hash = await exec('git remote update');
 	var repo_status = await exec('git status -uno');
-	let last_update = await exec('git log -1 --format=%cd ');
+	var remote_hash = await exec('git log -n 1 origin/master');
+	let last_update = await exec('git log -1 --format=%cd');
 
 	// Format the respective variables
-	remote_hash = await exec('git log -n 1 origin/master');
 	repo_url = repo_url.stdout.replace('.git', '').replace('\n', '');
 	repo_status = repo_status.stdout.split('\n')[1];
 	remote_hash = remote_hash.stdout.split('\n')[0].replace('commit', '').trim();
