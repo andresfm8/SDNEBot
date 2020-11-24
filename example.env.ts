@@ -28,6 +28,14 @@ export interface Prof {
 	highlightReview?: string
 };
 
+// Define a the Channel interface
+export interface NewChannel {
+	title: string;
+	type: 'category' | 'text';
+	topic: string;
+	parent?: string;
+};
+
 // Define the following env varibales
 export const botToken: string = '';
 export const dbFile: string = 'database.db';

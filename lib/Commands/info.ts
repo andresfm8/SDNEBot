@@ -157,7 +157,13 @@ export async function displayServerInfo(message: Discord.Message) {
                 },
                 {
                     name: '**Server Features**',
-                    value: (guild.features.length > 0) ? guild.features.forEach(feature => `:greenTick: ${ feature }`) : 'None',
+                    value: (guild.features.length > 0) ? guild.features.map(feature => `✅ ${ feature.replace('_', '') }`) : 'None',
+                    inline: true
+                },
+                {
+                    name: '**Nitro Boosts**',
+                    value: `**Tier:** ${ guild.premiumTier }\n**Boosters:** ${ guild.premiumSubscriptionCount }`,
+                    inline: true
                 },
             ]
         }
