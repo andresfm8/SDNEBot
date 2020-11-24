@@ -22,8 +22,8 @@ export async function displayVersionDetails(message: Discord.Message) {
 	// Grab the required variables
 	var repo_url = await exec('git config --get remote.origin.url');
 	let current_commit_hash = await exec('git rev-parse HEAD');
-	var repo_status = await exec('git status -uno');
 	var remote_hash = await exec('git remote update');
+	var repo_status = await exec('git status -uno');
 	let last_update = await exec('git log -1 --format=%cd ');
 
 	// Format the respective variables
