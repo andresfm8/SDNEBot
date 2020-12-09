@@ -11,6 +11,7 @@
  * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
  * November 23, 2020 -- N3rdP1um23 -- Added serverinfo command
  * November 29, 2020 -- N3rdP1um23 -- Added new emotion & additional admin helpers
+ * December 03, 2020 -- N3rdP1um23 -- Updated diary to handle errors a little better
  *
  */
 
@@ -190,14 +191,16 @@ export function hasURL(msg: Discord.Message | Discord.PartialMessage): boolean {
  * The following function is used to handle writing to the bots diary
  *
  * @param emotion : is the emotion of the diary entry
- * @param guild : is the Discord guild to handle
+ * @param section : is the Discord section that caused an issue
  * @param diary_object? : is the diary object to handle
  *
  */
-export async function diary(emotion = 'sad', guild: Discord.Guild, diary_object?) {
+export async function diary(emotion = 'sad', section: Discord.Message | Discord.PartialMessage | Discord.Guild, diary_object?) {
 	// Create the required variables
 	var bot_category;
 	var bot_diary_channel;
+	let guild = ((section instanceof Discord.Guild) ? section : (<Discord.Message | Discord.PartialMessage> section).guild);
+	let message = ((section instanceof Discord.Message) ? section : undefined);
 
 	// Check to see if there's a bot specific channel
 	await db.getConfig('bot_channel_id').then(async (result) => {
@@ -305,8 +308,17 @@ export async function diary(emotion = 'sad', guild: Discord.Guild, diary_object?
 					value: `${ emotions[emotion].emoji } ${ emotion.charAt(0).toUpperCase() + emotion.slice(1) }`
 				},
 				{
+					name: "**It happened in...**",
+					value: `${ (message) ? '<#' + message.channel.id + '>' : 'Idk...' }`,
+					inline: true
+				},
+				{
 					name: "**I did...**",
 					value: `\`\`\`${ (diary_object !== undefined) ? JSON.stringify(diary_object).substring(0, 1900).replace('`', '') : 'Nothing...' }\`\`\``
+				},
+				{
+					name: "**They said...**",
+					value: `${ (message) ? '\`\`\`' + message.content.toString() + '\`\`\`' : 'Idk...' }`
 				}
 			]
 		}

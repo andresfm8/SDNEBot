@@ -28,7 +28,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 	// Try the following and catch any errors that occur
 	try {
 		// Await the reaction
-		await reaction.message.fetch().catch(error => diary('sad', reaction.message.guild, error));
+		await reaction.message.fetch().catch(error => diary('sad', reaction.message, error));
 
 		// Fetch the user for processing
 		user.fetch().then(async user => {
@@ -48,7 +48,7 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 			});
 
 			// Create the required variables
-			let assign_role_message_id = await db.getConfig('assign').catch(error => diary('sad', reaction.message.guild, error));
+			let assign_role_message_id = await db.getConfig('assign').catch(error => diary('sad', reaction.message, error));
 			let assign_years = ['📗', '📘', '📙', '🧾'];
 			let assign_campus = ['1️⃣', '2️⃣'];
 			var member: Discord.GuildMember;
@@ -168,6 +168,6 @@ export async function handleReactionAdd(reaction: Discord.MessageReaction, user:
 		});
 	}catch(exception) {
 		// Log the error to the console
-		diary('sad', reaction.message.guild, exception);
+		diary('sad', reaction.message, exception);
 	}
 }

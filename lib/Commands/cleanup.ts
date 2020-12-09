@@ -47,7 +47,7 @@ export function cleanupMessages(message: Discord.Message, args) {
 	}
 
 	// Delete the message from the user
-	message.delete().catch(error => diary('sad', message.guild, error));
+	message.delete().catch(error => diary('sad', message, error));
 
 	if (message.channel.type === "dm" || message.channel.type === "news"){
 		// React with a question mark as the operation isn't corrent and then return to stop further processing

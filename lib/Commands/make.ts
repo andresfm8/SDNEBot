@@ -43,7 +43,7 @@ export function creatChannel(message: Discord.Message, args) {
 			message.guild.channels.create(channelName, {parent: message.guild.channels.resolve(yearChannels[yearChannels.findIndex(yearChannel => yearChannel.year === 1)].cid), topic: `Created by **${message.member.nickname}**`}).then(() => {
 				// React to the message from the user with an okay emoji to show that the channel was created
 				message.react('👌');
-			}).catch(error => diary('sad', message.guild, error));
+			}).catch(error => diary('sad', message, error));
 
 			// Update the created value to true and return to stop processing further
 			created = true;
@@ -53,7 +53,7 @@ export function creatChannel(message: Discord.Message, args) {
 			message.guild.channels.create(channelName, {parent: message.guild.channels.resolve(yearChannels[yearChannels.findIndex(yearChannel => yearChannel.year === 2)].cid), topic: `Created by **${message.member.nickname}**`}).then(() => {
 				// React to the message from the user with an okay emoji to show that the channel was created
 				message.react('👌');
-			}).catch(error => diary('sad', message.guild, error));
+			}).catch(error => diary('sad', message, error));
 
 			// Update the created value to true and return to stop processing further
 			created = true;
@@ -63,7 +63,7 @@ export function creatChannel(message: Discord.Message, args) {
 			message.guild.channels.create(channelName, {parent: message.guild.channels.resolve(yearChannels[yearChannels.findIndex(yearChannel => yearChannel.year === 3)].cid), topic: `Created by **${message.member.nickname}**`}).then(() => {
 				// React to the message from the user with an okay emoji to show that the channel was created
 				message.react('👌');
-			}).catch(error => diary('sad', message.guild, error));
+			}).catch(error => diary('sad', message, error));
 
 			// Update the created value to true and return to stop processing further
 			created = true;
