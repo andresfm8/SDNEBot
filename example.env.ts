@@ -7,6 +7,7 @@
  * Updates
  * -------
  * November 1, 2020 -- N3rdP1um23 -- Added Role interface and also localRoles templating
+ * November 29, 2020 -- N3rdP1um23 -- Added YearChannel interface
  *
  */
 
@@ -15,6 +16,12 @@ export interface Role {
 	rid: string;
 	name: string;
 	full_name?: string;
+};
+
+// Define a the YearChannel interface
+export interface YearChannel {
+	year: number;
+	cid: string;
 };
 
 // Define the Prof interface
@@ -43,7 +50,20 @@ export const generalChannel: string = '';
 export const introductionChannel: string = '';
 export const editChannel: string = '';
 export const deletedChannel: string = '';
-export const yearChannels: Array<string> = ['', '', ''];
+export const yearChannels: Array<Object> = [
+	{
+		year: 1,
+		cid: ''
+	},
+	{
+		year: 2,
+		cid: ''
+	},
+	{
+		year: 3,
+		cid: ''
+	}
+];
 export const commandPrefix: string = '!';
 export const localRoles = [
 	{

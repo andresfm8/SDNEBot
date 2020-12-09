@@ -10,6 +10,7 @@
  * November 18, 2020 -- N3rdP1um23 -- Added channel commands to the help menu
  * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
  * November 23, 2020 -- N3rdP1um23 -- Added serverinfo command
+ * November 29, 2020 -- N3rdP1um23 -- Added new emotion & additional admin helpers
  *
  */
 
@@ -25,9 +26,15 @@ const emotions = {
 		color: 3447003,
 		emoji: ':slight_frown:'
 	},
+
 	happy: {
 		color: 15105570,
 		emoji: ':smiley:'
+	},
+
+	interested: {
+		color: 1752220,
+		emoji: ':face_with_monocle:'
 	},
 };
 
@@ -86,7 +93,9 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 		tips.push({ 'name': 'Update bot (repo) version', 'value': '```!update```' });
 		tips.push({ 'name': 'Archive Channel', 'value': '```!channel archive [clone=false]```' });
 		tips.push({ 'name': 'Clone Channel', 'value': '```!channel clone [clone=false]```' });
-		tips.push({ 'name': 'Clone Channel', 'value': '```!channel remove```' });
+		tips.push({ 'name': 'Remove Channel', 'value': '```!channel remove```' });
+		tips.push({ 'name': 'Display Roles Array', 'value': '```!admin rolesArray```' });
+		tips.push({ 'name': 'Display Year Channels Array', 'value': '```!admin yearChannelsArray```' });
 	}
 
 	// Define the max amount of pages  based on the amount of tips

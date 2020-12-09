@@ -11,6 +11,7 @@
  * November 18, 2020 -- N3rdP1um23 -- Added channel commands
  * November 20, 2020 -- N3rdP1um23 -- Added admin commands & new log handling
  * November 23, 2020 -- N3rdP1um23 -- Added serverinfo command
+ * November 29, 2020 -- N3rdP1um23 -- Added additional admin commands
  *
  */
 
@@ -199,6 +200,30 @@ export function handleMessage(message: Discord.Message) {
 				}else{
 					// Send an error message
 					message.channel.send('Oops... Missing/wrong channel action to execute.');
+				}
+
+				// Return to stop further processing
+				return;
+			}
+
+			// Check to see if the user is executing the admin command
+			if(command === 'admin') {
+				// Create a variable that will hold the action value
+				let action = args.shift();
+
+				// Map the admin actions array
+				let admin_actions = {
+					rolesArray: 'displayRolesArray',
+					yearChannelsArray: 'displayYearChannelsArray',
+				};
+
+				// Check to see if the action argument is valid
+				if(Object.keys(admin_actions).includes(action)) {
+					// Execute the respective action
+					commands['admin'][admin_actions[action]](message, args);
+				}else{
+					// Send an error message
+					message.channel.send('Oops... Missing/wrong admin action to execute.');
 				}
 
 				// Return to stop further processing

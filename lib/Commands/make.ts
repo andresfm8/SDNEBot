@@ -4,10 +4,15 @@
  * November 1, 2020
  * The following file is used to handle creating a channel
  *
+ * Updates
+ * -------
+ * November 29, 2020 -- N3rdP1um23 -- Updated array handling to be a little cleaner
+ *
  */
 
 // Import the requried items
 import * as Discord from 'discord.js';
+import { diary } from '../funcs';
 import { roles, yearChannels } from '../globVars';
 
 /**
@@ -35,36 +40,36 @@ export function creatChannel(message: Discord.Message, args) {
 		// Check to see if the user has the year one role
 		if(role === roles['📗']) {
 			// Create the channel until the Year 1 parent channel
-			message.guild.channels.create(channelName, {parent: message.guild.channels.resolve(yearChannels[0]), topic: `Created by **${message.member.nickname}**`}).then(() => {
+			message.guild.channels.create(channelName, {parent: message.guild.channels.resolve(yearChannels[yearChannels.findIndex(yearChannel => yearChannel.year === 1)].cid), topic: `Created by **${message.member.nickname}**`}).then(() => {
 				// React to the message from the user with an okay emoji to show that the channel was created
 				message.react('👌');
-			});
+			}).catch(error => diary('sad', message.guild, error));
 
 			// Update the created value to true and return to stop processing further
 			created = true;
 			return;
 		}else if(role === roles['📘']) {
 			// Create the channel until the Year 2 parent channel
-			message.guild.channels.create(channelName, {parent: message.guild.channels.resolve(yearChannels[1]), topic: `Created by **${message.member.nickname}**`}).then(() => {
+			message.guild.channels.create(channelName, {parent: message.guild.channels.resolve(yearChannels[yearChannels.findIndex(yearChannel => yearChannel.year === 2)].cid), topic: `Created by **${message.member.nickname}**`}).then(() => {
 				// React to the message from the user with an okay emoji to show that the channel was created
 				message.react('👌');
-			});
+			}).catch(error => diary('sad', message.guild, error));
 
 			// Update the created value to true and return to stop processing further
 			created = true;
 			return;
 		}else if(role === roles['📙']) {
 			// Create the channel until the Year 3 parent channel
-			message.guild.channels.create(channelName, {parent: message.guild.channels.resolve(yearChannels[2]), topic: `Created by **${message.member.nickname}**`}).then(() => {
+			message.guild.channels.create(channelName, {parent: message.guild.channels.resolve(yearChannels[yearChannels.findIndex(yearChannel => yearChannel.year === 3)].cid), topic: `Created by **${message.member.nickname}**`}).then(() => {
 				// React to the message from the user with an okay emoji to show that the channel was created
 				message.react('👌');
-			});
+			}).catch(error => diary('sad', message.guild, error));
 
 			// Update the created value to true and return to stop processing further
 			created = true;
 			return;
 		}
-	})
+	});
 
 	// Check to see if the channel wasn't created
 	if(!created) {
