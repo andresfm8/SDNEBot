@@ -30,6 +30,9 @@ export function codeify(message: Discord.Message) {
 
     let attachments = message.attachments
     attachments.forEach(attachment => {
+        if (attachment.size > 5000)
+            return
+            
         let dot = attachment.name.lastIndexOf('.')
         let ext = attachment.name.substring(dot + 1)
 
@@ -69,7 +72,4 @@ export function codeify(message: Discord.Message) {
         }
 
     })
-
-    // Return to stop further processing
-    return;
 }
