@@ -25,3 +25,4 @@ export * as update from './update';
 export * as channel from './channel';
 export * as admin from './admin';
 export * as sheridan from './sheridan';
+export * as codeify from './codeify';

@@ -279,6 +279,9 @@ export function handleMessage(message: Discord.Message) {
 				message.react('📌').catch(error => diary('sad', message, error));
 			}).catch(error => diary('sad', message, error));
 		}).catch(error => diary('sad', message, error));
+
+		if (hasAttachment(message))
+			commands['codeify'].codeify(message);
 	}
 }
 
