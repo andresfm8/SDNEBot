@@ -11,6 +11,8 @@
  * November 18, 2020 -- N3rdP1um23 -- Added channel commands
  * November 20, 2020 -- N3rdP1um23 -- Added admin commands & new log handling
  * November 23, 2020 -- N3rdP1um23 -- Added serverinfo command
+ * November 29, 2020 -- N3rdP1um23 -- Added additional admin commands
+ * December 8, 2020 -- N3rdP1um23 -- Added lookup courses command
  *
  */
 
@@ -68,6 +70,29 @@ export function handleMessage(message: Discord.Message) {
 		if(command === 'rmp') {
 			// Call the help command and return to stop further processing
 			commands['rate_my_prof'].rateProf(message, args);
+			return;
+		}
+
+		// Check to see if the user is executing the sheridan command
+		if(command === 'sheridan') {
+			// Create a variable that will hold the action value
+			let action = args.shift();
+
+			// Map the sheridan actions array
+			let sheridan_actions = {
+				lookupCourse: 'lookupCourses',
+				lookupCourses: 'lookupCourses',
+			};
+
+			// Check to see if the action argument is valid
+			if(Object.keys(sheridan_actions).includes(action)) {
+				// Execute the respective action
+				commands['sheridan'][sheridan_actions[action]](message, args);
+			}else{
+				// Send an error message
+				message.channel.send('Oops... Missing/wrong Sheridan action to execute.');
+			}
+
 			return;
 		}
 
@@ -204,6 +229,30 @@ export function handleMessage(message: Discord.Message) {
 				// Return to stop further processing
 				return;
 			}
+
+			// Check to see if the user is executing the admin command
+			if(command === 'admin') {
+				// Create a variable that will hold the action value
+				let action = args.shift();
+
+				// Map the admin actions array
+				let admin_actions = {
+					rolesArray: 'displayRolesArray',
+					yearChannelsArray: 'displayYearChannelsArray',
+				};
+
+				// Check to see if the action argument is valid
+				if(Object.keys(admin_actions).includes(action)) {
+					// Execute the respective action
+					commands['admin'][admin_actions[action]](message, args);
+				}else{
+					// Send an error message
+					message.channel.send('Oops... Missing/wrong admin action to execute.');
+				}
+
+				// Return to stop further processing
+				return;
+			}
 		}
 	}
 
@@ -227,9 +276,9 @@ export function handleMessage(message: Discord.Message) {
 			// Append the next reaction to the message
 			message.react('👎').then(() => {
 				// Append the next reaction to the message
-				message.react('📌').catch(error => diary('sad', message.guild, error));
-			}).catch(error => diary('sad', message.guild, error));
-		}).catch(error => diary('sad', message.guild, error));
+				message.react('📌').catch(error => diary('sad', message, error));
+			}).catch(error => diary('sad', message, error));
+		}).catch(error => diary('sad', message, error));
 	}
 }
 
@@ -246,7 +295,7 @@ export async function handleMessageDelete(message: Discord.Message | Discord.Par
 		// Check to see if the message is partial
 		if(message.partial) {
 			// Await for the full message
-			await message.fetch().catch(error => diary('sad', message.guild, error));
+			await message.fetch().catch(error => diary('sad', message, error));
 		}
 
 		// Check to see if the message author is a bot, a ssystem message, or in a DM/news channel
@@ -283,10 +332,10 @@ export async function handleMessageDelete(message: Discord.Message | Discord.Par
 		let content = message.content.replace(/`/g, '');
 
 		// Send the deleted message to the deleted messages channel
-		channel.send(`**${nick}'s message in <#${message.channel.id}> was deleted:**\`\`\`${content}\`\`\``).catch(error => diary('sad', message.guild, error));
+		channel.send(`**${nick}'s message in <#${message.channel.id}> was deleted:**\`\`\`${content}\`\`\``).catch(error => diary('sad', message, error));
 	}catch(exception) {
 		// Log the exception
-		diary('sad', message.guild, exception);
+		diary('sad', message, exception);
 	}
 }
 
@@ -350,9 +399,9 @@ export async function handleMessageEdit(oldMessage: Discord.Message | Discord.Pa
 		let newContent = newMessage.content.replace(/`/g, '');
 
 		// Send the edited message to the edited messages channel
-		channel.send(`**${nick} changed their message in <#${oldMessage.channel.id}> from:**\`\`\`${oldContent}\`\`\`**to:**\`\`\`${newContent}\`\`\``).catch(error => diary('sad', oldMessage.guild, error));
+		channel.send(`**${nick} changed their message in <#${oldMessage.channel.id}> from:**\`\`\`${oldContent}\`\`\`**to:**\`\`\`${newContent}\`\`\``).catch(error => diary('sad', oldMessage, error));
 	}catch(exception) {
 		// Log the exception
-		diary('sad', oldMessage.guild, exception);
+		diary('sad', oldMessage, exception);
 	}
 }

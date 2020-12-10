@@ -115,7 +115,7 @@ export function warnUsers(message: Discord.Message, args, color) {
 	// Check to see if the warned list isn't empty
 	if (warned !== '') {
 		// Send the embed to the channel and then delete the original message
-		message.channel.send(warned, embed).then(() => message.delete().catch(error => diary('sad', message.guild, error)));
+		message.channel.send(warned, embed).then(() => message.delete().catch(error => diary('sad', message, error)));
 	}else{
 		// React to the request with a question mark as the command either wasn't complete or something else happened
 		message.react('❓');

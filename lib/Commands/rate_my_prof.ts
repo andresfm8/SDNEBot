@@ -135,7 +135,7 @@ export function rateProf(message: Discord.Message, args) {
 		}catch(exception) {
 			// Reply with an error, log the exception, and then return to stop further processing
 			message.reply('I had trouble finding that professor. Please double check your spelling!');
-			diary('sad', message.guild, exception);
+			diary('sad', message, exception);
 			return;
 		}
 	}else{
@@ -258,11 +258,11 @@ function singleProf(findId: number, message: Discord.Message) {
 		}).catch(error => {
 			// Reply with an error message, log the error, and return to stop further processing
 			message.reply('I had trouble finding that professor. Please double check your spelling!');
-			diary('sad', message.guild, error);
+			diary('sad', message, error);
 			return;
 		});
 	}catch(exception) {
 		// Log the exception
-		diary('sad', message.guild, exception);
+		diary('sad', message, exception);
 	}
 }

@@ -50,7 +50,7 @@ export function displayRules(message: Discord.Message) {
     });
 
     // Attempt to delete the original message from the user
-    message.delete().catch(error => diary('sad', message.guild, error));
+    message.delete().catch(error => diary('sad', message, error));
 
     // Check to see if the message should be sent to the users DMs
     if(dm) {

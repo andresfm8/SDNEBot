@@ -16,7 +16,7 @@ export var generalChannel: string = env['generalChannel'];
 export var introductionChannel: string = env['introductionChannel'];
 export var editChannel: string = env['editChannel'];
 export var deletedChannel: string = env['deletedChannel'];
-export var yearChannels: Array<string> = env['yearChannels'];
+export var yearChannels: Array<env.YearChannel> = env['yearChannels'];
 export var commandPrefix: string = env['commandPrefix'];
 
 // Export a function that will help updating the help page variable

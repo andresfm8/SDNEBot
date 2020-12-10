@@ -10,6 +10,8 @@
  * November 18, 2020 -- N3rdP1um23 -- Added channel commands to the help menu
  * November 20, 2020 -- N3rdP1um23 -- Updated to use new log handler
  * November 23, 2020 -- N3rdP1um23 -- Added serverinfo command
+ * November 29, 2020 -- N3rdP1um23 -- Added new emotion & additional admin helpers
+ * December 03, 2020 -- N3rdP1um23 -- Updated diary to handle errors a little better
  *
  */
 
@@ -25,9 +27,15 @@ const emotions = {
 		color: 3447003,
 		emoji: ':slight_frown:'
 	},
+
 	happy: {
 		color: 15105570,
 		emoji: ':smiley:'
+	},
+
+	interested: {
+		color: 1752220,
+		emoji: ':face_with_monocle:'
 	},
 };
 
@@ -86,7 +94,9 @@ export function help(member: Discord.GuildMember, page: number, channel?: Discor
 		tips.push({ 'name': 'Update bot (repo) version', 'value': '```!update```' });
 		tips.push({ 'name': 'Archive Channel', 'value': '```!channel archive [clone=false]```' });
 		tips.push({ 'name': 'Clone Channel', 'value': '```!channel clone [clone=false]```' });
-		tips.push({ 'name': 'Clone Channel', 'value': '```!channel remove```' });
+		tips.push({ 'name': 'Remove Channel', 'value': '```!channel remove```' });
+		tips.push({ 'name': 'Display Roles Array', 'value': '```!admin rolesArray```' });
+		tips.push({ 'name': 'Display Year Channels Array', 'value': '```!admin yearChannelsArray```' });
 	}
 
 	// Define the max amount of pages  based on the amount of tips
@@ -181,14 +191,16 @@ export function hasURL(msg: Discord.Message | Discord.PartialMessage): boolean {
  * The following function is used to handle writing to the bots diary
  *
  * @param emotion : is the emotion of the diary entry
- * @param guild : is the Discord guild to handle
+ * @param section : is the Discord section that caused an issue
  * @param diary_object? : is the diary object to handle
  *
  */
-export async function diary(emotion = 'sad', guild: Discord.Guild, diary_object?) {
+export async function diary(emotion = 'sad', section: Discord.Message | Discord.PartialMessage | Discord.Guild, diary_object?) {
 	// Create the required variables
 	var bot_category;
 	var bot_diary_channel;
+	let guild = ((section instanceof Discord.Guild) ? section : (<Discord.Message | Discord.PartialMessage> section).guild);
+	let message = ((section instanceof Discord.Message) ? section : undefined);
 
 	// Check to see if there's a bot specific channel
 	await db.getConfig('bot_channel_id').then(async (result) => {
@@ -296,8 +308,17 @@ export async function diary(emotion = 'sad', guild: Discord.Guild, diary_object?
 					value: `${ emotions[emotion].emoji } ${ emotion.charAt(0).toUpperCase() + emotion.slice(1) }`
 				},
 				{
+					name: "**It happened in...**",
+					value: `${ (message) ? '<#' + message.channel.id + '>' : 'Idk...' }`,
+					inline: true
+				},
+				{
 					name: "**I did...**",
 					value: `\`\`\`${ (diary_object !== undefined) ? JSON.stringify(diary_object).substring(0, 1900).replace('`', '') : 'Nothing...' }\`\`\``
+				},
+				{
+					name: "**They said...**",
+					value: `${ (message) ? '\`\`\`' + message.content.toString() + '\`\`\`' : 'Idk...' }`
 				}
 			]
 		}

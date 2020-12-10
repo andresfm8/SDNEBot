@@ -125,7 +125,7 @@ export function archive(message: Discord.Message, args) {
 			};
 
 			// Handle updateing the respective channel
-			current_channel.setParent(archive_category_channel.id, { lockPermissions: true }).then(() => message.channel.send(archive_embed)).catch(error => diary('sad', message.guild, error));
+			current_channel.setParent(archive_category_channel.id, { lockPermissions: true }).then(() => message.channel.send(archive_embed)).catch(error => diary('sad', message, error));
 		}
 	});
 

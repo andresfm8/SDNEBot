@@ -39,7 +39,7 @@ export function displayIntroInformation(message: Discord.Message) {
 
     // Send the embed to the channel and then delete the message
     message.channel.send(introEmbed);
-    message.delete().catch(error => diary('sad', message.guild, error));
+    message.delete().catch(error => diary('sad', message, error));
 
     // Return to stop further processing
     return;

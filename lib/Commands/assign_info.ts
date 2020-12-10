@@ -66,7 +66,7 @@ export function displayAssignInfo(message: Discord.Message) {
     };
 
     // Delete the users message
-    message.delete().catch(error => diary('sad', message.guild, error));
+    message.delete().catch(error => diary('sad', message, error));
 
     // Send the embed to the channel
     message.channel.send(embed).then(async (embed_message: Discord.Message) => {
