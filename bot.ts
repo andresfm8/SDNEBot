@@ -24,6 +24,8 @@ import { createConnection } from 'typeorm';
 import { Config } from './lib/Entities/Config';
 import { User } from './lib/Entities/User';
 import { diary } from './lib/funcs';
+import { monitorNews } from './lib/Events/MonitorNews';
+import { Article } from './lib/Entities/Article';
 
 // Create the requried instances
 export const bot = new Discord.Client({ partials: Object.values(Discord.Constants.PartialTypes) })
@@ -34,7 +36,8 @@ createConnection({
 	database: `./${dbFile}`,
 	entities: [
 		Config,
-		User
+		User,
+		Article
 	],
 	synchronize: true,
 	logging: false
@@ -57,6 +60,7 @@ createConnection({
 				roles[resRole.name] = discord_role;
 			}
 		});
+		monitorNews().start();
 	});
 
 	// Listen for Members joining

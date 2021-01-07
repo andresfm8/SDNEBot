@@ -15,6 +15,7 @@ import { getConnection, getRepository } from 'typeorm';
 import { Config } from './lib/Entities/Config';
 import { User } from './lib/Entities/User';
 import * as moment from 'moment';
+import { Article } from './lib/Entities/Article';
 
 // The following function is used to return a selected user
 export async function getUser(uid: string, name: string, callback: Function) {
@@ -127,4 +128,17 @@ export async function updateConfig(key: string, value: string) {
 
 	// Update the respective config item value based on the passed in key
 	await getConnection().getRepository(Config).createQueryBuilder().update(Config).set({ value: value }).where('key = :key', { key: key }).execute();
+}
+
+export async function getArticleByUrl(url: string){
+	let article: Article = await getConnection().getRepository(Article).createQueryBuilder("article").where("url = :url", {url: url}).getOne();
+	return article;
+}
+
+export function addArticle(article: Article){
+	getConnection().getRepository(Article).createQueryBuilder().insert().into(Article)
+	.values({
+		url: article.url,
+		title: article.title
+	}).execute();
 }
